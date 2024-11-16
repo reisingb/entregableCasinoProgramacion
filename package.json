@@ -4,7 +4,8 @@
   "description": "equipo de 5 integrantes para realizar un proyecto de casino online",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc src/main.ts --lib es2023,dom --outDir ./dist && node dist/main.js"
+    "start": "tsc && node dist/main.js",
+    "dev": "ts-node src/main.ts"
   },
   "author": "",
   "license": "ISC",
