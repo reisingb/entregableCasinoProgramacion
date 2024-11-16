@@ -1,0 +1,14 @@
+{
+  "name": "entregablecasinoprogramacion",
+  "version": "1.0.0",
+  "description": "equipo de 5 integrantes para realizar un proyecto de casino online",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc src/main.ts --lib es2023,dom --outDir ./dist && node dist/main.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  }
+}
