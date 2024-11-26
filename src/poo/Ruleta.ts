@@ -1,22 +1,22 @@
-import { Casino } from "./Casino";
 import { Juego } from "./Juego";
-
+import rd from "readline-sync";
 
 export class Ruleta extends Juego {
+    private numerosRojos:number[]
+    private numerosNegros:number[];
+
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
         super(nombre,apuestaMin, apuestaMax);
+        this.numerosRojos=[1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        this.numerosNegros=[2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
     }
 
-    public apostar(): void {
-
+    public getNumerosRojos(): number[] {
+        return this.numerosRojos;
     }
 
-    public salirJuego(): void {
-
-    }
-
-    public retirarTicket(): void {
-
+    public getNumerosNegors(): number[] {
+        return this.numerosNegros;
     }
 
     public calcularPerdida(): number {
@@ -27,17 +27,10 @@ export class Ruleta extends Juego {
         return 0
     }
 
-    public calcular(): number {
-        return 0
+    public IniciarJuego(): void {
+        this.apostar()
     }
-    
-    public cargarCredito(montoCredito: number): string {
-        this.actualizarMonto(montoCredito);
-        if(this.verificarMontoCarga()){
-            this.montoCredito+=montoCredito;
-            return `Su carga de ${montoCredito} fue un exito!`;
-        }
-        this.actualizarMonto(0);
-        return `Error:\nPara el juego ${this.getNombre()} el minimo/maximo es:\nmin${this.getApuestaMin()} - maximo ${this.getApuestaMax()}\nIntentelo nuevamente.`;
+    public calcularPagos(): number{
+        return 1;
     }
 }

@@ -1,7 +1,6 @@
 import readlineSync from "readline-sync";
 import pc from "picocolors";
 import { GestionCasino } from "./interfaceGestionCasino";
-import { Casino } from "./Casino";
 
 // CLASE JUEGO ABSTRACTA
 export abstract class Juego implements GestionCasino {
@@ -11,7 +10,7 @@ export abstract class Juego implements GestionCasino {
     protected montoCredito: number;
     protected montoApuesta: number
     protected tiempo: number;
-    protected salir: boolean;
+    private salirJuego: boolean;
 
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
         this.nombre = nombre;
@@ -20,7 +19,7 @@ export abstract class Juego implements GestionCasino {
         this.apuestaMax = apuestaMax;
         this.apuestaMin = apuestaMin;
         this.tiempo = 2000;
-        this.salir = false;
+        this.salirJuego = false;
     }
 
     public getNombre(): string {
@@ -79,12 +78,12 @@ export abstract class Juego implements GestionCasino {
         this.tiempo = tiempo;
     }
 
-    public isSalir(): boolean {
-        return this.salir;
+    public isSalirJuego(): boolean {
+        return this.salirJuego;
     }
 
-    public setSalir(salir: boolean): void {
-        this.salir = salir;
+    public setSalirJuego(salirJuego: boolean): void {
+        this.salirJuego = salirJuego;
     }
 
     // METODO PARA ACTUALIZAR CREDITO EN JUEGO
@@ -97,18 +96,10 @@ export abstract class Juego implements GestionCasino {
         return apuesta >= this.getApuestaMin() && apuesta <= this.getApuestaMax() && apuesta <= this.getCredito();
     }
 
-    // VERIFICA EL MONTO DE LA CARGA EVALUANDO EL MINIMO Y MAXIMO EN CADA JUEGO
+    // VERIFICA EL MONTO DE LA CARGA EVALUANDO EL MINIMO DE CADA JUEGO
     public verificarMontoCarga(): boolean {
-        return this.getCredito() >= this.getApuestaMin() /*&& this.getCredito() <= this.getApuestaMax()*/;
-        //Podes cargar mas credito que el de apuestaMax porque podes cargar el credito que quieras, a la hora de apostar tener restriccion
-        //(porque es para cuidar el cliente para que no apueste todo en la jugada)
+        return this.getCredito() >= this.getApuestaMin();
     }
-
-    // // VERIFICA EL MONTO ACTUAL ACREDITADO
-    // public verificarMontoActual(): boolean {
-    //     // RETORNA TRUE O FALSE
-    //     return this.getCredito() >= this.getApuestaMin() && this.getCredito() <= this.getApuestaMax();
-    // }
 
     // CARGAR Y VERIFICAR EL MONTO INGRESADO
     public verificarCargaCredito(entrada: number): void {
@@ -129,7 +120,7 @@ export abstract class Juego implements GestionCasino {
                 setTimeout(() => {
                     console.clear();
                 }, this.getTiempo());
-               ;
+                ;
                 break;
             }
         }
@@ -138,11 +129,12 @@ export abstract class Juego implements GestionCasino {
     public mensajeCarga(): void {
         let opcionMenu: number;
         setTimeout(() => {
-            opcionMenu = readlineSync.questionInt(pc.yellow(pc.bold("1- Ingresar monto.\n2- Menu de opciones.\n3- Salir.\n")));
-            this.verificarCargaCredito(opcionMenu, this.mensajeCarga);
+            do {
+                opcionMenu = readlineSync.questionInt(pc.yellow(pc.bold("1- Ingresar monto.\n2- Menu de opciones.\n3- Salir.\n")));
+                this.verificarCargaCredito(opcionMenu);
+            } while (opcionMenu !== 0 && !this.isSalirJuego())
         }, this.getTiempo());
     }
-
 
     // FUNCION DE VALIDACION DE SUBMENU DE OPCIONES
     public verificarEntradaMenuOpciones(entrada: number): void {
@@ -157,13 +149,9 @@ export abstract class Juego implements GestionCasino {
                 console.log("Presionaste J");
                 break;
             }
-            // IR A MENU PRINCIPAL
-            case 3: {
-                this.casino.iniciarPrograma();
-                break;
-            }
             //SALIR DEL JUEGO
-            case 4: {
+            case 3: {
+                this.setSalirJuego(true);
                 return;
             }
             default: {
@@ -173,56 +161,52 @@ export abstract class Juego implements GestionCasino {
         }
     }
 
-
-
     public iniciarMenuDeOpciones() {
         let opcionMenu: number;
         setTimeout(() => {
-            opcionMenu = readlineSync.questionInt(pc.yellow(pc.bold('1- Cargar credito.\n2- Ver Instruccion.\n3- Comenzar Juego.\n4- Atras.\n: ')));
-            this.verificarEntradaMenuOpciones(opcionMenu, this.iniciarMenuDeOpciones);
-        },this.getTiempo());
+            do {
+                opcionMenu = readlineSync.questionInt(pc.yellow(pc.bold('1- Cargar credito.\n2- Ver Instruccion.\n3- Comenzar Juego.\n4- Atras.\n: ')));
+                this.verificarEntradaMenuOpciones(opcionMenu);
+            } while (opcionMenu !== 0 && !this.isSalirJuego())
+        }, this.getTiempo());
     }
 
-    public iniciarPrograma() {
-        this.casino.iniciarPrograma();
-    }
-
-    // public iniciarJuego():void{
-    //     //ACA SE PODRIA PONER  LOS METODOS RELACIONADOS AL JUEGO 
-    // };
-
-    public salirJuego(): void {
-        // AQUI PORDRIAMOS SIMPLEMENTE SALIR DEL JUEGO Y VOLVER A MOSTRAR LISTA DE JUEGOS
-        console.log(pc.bold("Haz salido del juego."));
-        this.casino.elegirJuego();
-    }
+    // public salirJuego(): void {
+    //     // AQUI PORDRIAMOS SIMPLEMENTE SALIR DEL JUEGO Y VOLVER A MOSTRAR LISTA DE JUEGOS
+    //     console.log(pc.bold("Haz salido del juego."));
+    //     this.iniciarMenuDeOpciones();
+    // }
 
     public obtenerEntradaApuesta(): number {
-        return readlineSync.questionInt("Ingrese cantidad de dinero a apostar: ");
+        let cantidad:number;
+        do{
+            cantidad = readlineSync.questionInt("Ingrese cantidad de dinero a apostar: ");
+        }while(cantidad !== 0 && !this.verificarMontoApuesta(cantidad));
+        return cantidad;
     }
 
-    public obtenerEntradaNum(): number{
+    public obtenerEntradaNum(): number {
         return readlineSync.questionInt("Ingrese una opcion:")
     }
 
     // METODO PARA RETIRAR TICKET
-    public retirarTicket(): void {
-     }
+    public retirarTicket(): void {}
+
     // METODO PARA CARGAR CREDITO AL JUEGO
-    public cargarCredito(montoCredito: number): string { }
-    abstract calcularPerdida(): number { }
-    abstract calcularGanancia(): number { }
+    public cargarCredito(montoCredito: number): void { }
 
     //METODO PARA APOSTAR
     public apostar(apuesta: number) {
         if (this.verificarMontoApuesta(apuesta)) {
             this.actualizarMontoCredito(apuesta);
-            console.log(`Apostaste ${apuesta}.\n Credito disponible: ${this.getCredito()}`)
+            console.log(pc.green(`Apostaste ${apuesta}.\n Credito disponible: ${this.getCredito()}`))
         } else {
-            console.log("Monto de apuesta no valido")
+            console.log(pc.magenta("Monto de apuesta no valido"))
         }
     }
 
+    abstract calcularPerdida(): number
+    abstract calcularGanancia(): number 
     abstract IniciarJuego(): void;
     abstract calcularPagos(): number
 }
