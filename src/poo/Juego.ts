@@ -38,4 +38,8 @@ export class Juego {
     getNombre(): string {
         return this.nombre;
     }
+<<<<<<< HEAD
 };
+=======
+}
+>>>>>>> main
