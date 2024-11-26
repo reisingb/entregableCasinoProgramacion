@@ -1,20 +1,14 @@
 import { Casino } from "./Casino";
 import { Juego } from "./Juego";
 
-
-export class Ruleta extends Juego {
-    constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
-        super(nombre,apuestaMin, apuestaMax);
+export class Dado  extends Juego{
+    constructor(nombre:string, apuestaMin:number, apuestaMax:number){
+        super(nombre, apuestaMin, apuestaMax);
     }
-
     public apostar(): void {
 
     }
-
-    public salirJuego(): void {
-
-    }
-
+    
     public retirarTicket(): void {
 
     }
