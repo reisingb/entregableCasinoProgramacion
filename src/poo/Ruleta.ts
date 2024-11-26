@@ -17,8 +17,16 @@ export class Ruleta extends Juego {
         return this.numerosRojos;
     }
 
-    public getNumerosNegors(): number[] {
+    public setNumerosRojos(numerosRojo: number): void {
+        this.numerosRojos.push(numerosRojo);
+    }
+
+    public getNumerosNegros(): number[] {
         return this.numerosNegros;
+    }
+
+    public setNumerosNegros(numerosNegro: number): void {
+        this.numerosNegros.push(numerosNegro);
     }
 
     public calcularPerdida(): number {
@@ -30,7 +38,7 @@ export class Ruleta extends Juego {
     }
 
     public IniciarJuego(): void {
-       
+       this.IniciarJuego
     }
     public calcularPagos(): number{
         return 1;
