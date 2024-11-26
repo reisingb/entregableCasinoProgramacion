@@ -12,5 +12,8 @@
   "dependencies": {
     "picocolors": "^1.1.1",
     "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@types/readline-sync": "^1.4.8"
   }
 }

@@ -3,18 +3,22 @@ import readlineSync from "readline-sync";
 import pc from "picocolors";
 import { Analogico } from "./Analogico";
 import { Digital } from "./Digital";
-import { Dado } from "./dado";
+import { Dado } from "./Dado";
 import { Ruleta } from "./Ruleta";
 import { GestionCasino } from "./interfaceGestionCasino";
 import { Juego } from "./Juego";
 
 export class Casino implements GestionCasino {
-    private juego: Juego | null; //LISTA DE JUEGOS
+    private juegos: Juego[]; //LISTA DE JUEGOS
     private nombre: string; //NOMBRE DE CASINO
+    protected salir: boolean;
+    protected tiempo = 2000;
+
 
     constructor(nombre: string) {
-        this.juego = null; //INICIAR EN ARREGLO VACIO
+        this.juegos = []; //INICIAR EN ARREGLO VACIO
         this.nombre = nombre;
+        this.salir = false;
     }
 
     // OBTENER EL NOMBRE DEL CASINO
@@ -27,67 +31,86 @@ export class Casino implements GestionCasino {
         this.nombre = nombre;
     }
 
-   /*  // OBTENER LA LISTA DE LOS JUEGOS
-    public getJuegos(): Juego | string {
-        if (!this.verificarLongitudListaJuegos()) {
-            return `No hay juegos en el casinno`;
-        }
-        return this.juegos;
-    } */
-/*  */
-/*     // ACTUALIZAR O AÑADIR NUEVO JUEGO */
-/*     public setJuego(juego: Juego): void { */
-/*         this.juegos.push(juego); */
-/*     } */
-/*  */
-  /*   // METODO QUE VERIFICA LA LONGITUD DE LA LISTA DE JUEGOS
-    public verificarLongitudListaJuegos(): boolean {
-        return this.juegos.length > 0;
-    } */
+    // // OBTENER LA LISTA DE LOS JUEGOS
+    // public getJuegos(): Juego[] {
+    //     if (!this.verificarLongitudListaJuegos()) {
+    //         return `No hay juegos en el casinno`;
+    //     }
+    //     return this.juegos;
+    // }
 
-    // METODO QUE SE ENCARGA DE INSTANCIAR LOS JUEGOS SEGUN EL NOMBRE
-    /*  */
-        
-     public  getJuego():Juego | null{
-        if(!this.juego ) return null;
-        return this.juego;
-        
+    // ACTUALIZAR O AÑADIR NUEVO JUEGO */
+    public setJuego(juego: Juego): void {
+        this.juegos.push(juego);
     }
 
+    // METODO QUE VERIFICA LA LONGITUD DE LA LISTA DE JUEGOS
+    public verificarLongitudListaJuegos(): boolean {
+        return this.juegos.length > 0;
+    }
+
+    // METODO QUE SE ENCARGA DE INSTANCIAR LOS JUEGOS SEGUN EL NOMBRE
+
+    public getJuego(): Juego | null {
+        if (!this.juegos) return null;
+        return this.juegos;
+
+    }
+
+    public isSalir(): boolean {
+        return this.salir;
+    }
+
+    public setSalir(salir: boolean): void {
+        this.salir = salir;
+    }
+
+    public getTiempo(): number {
+        return this.tiempo;
+    }
+
+    public setTiempo(tiempo: number): void {
+        this.tiempo = tiempo;
+    }
+
+    agregarJuego(juego: Juego){
+        this.juegos.push(juego)
+    }
+
+
     // FUNCION QUE VALIDA LAS ENTRADAS PARA EL JUEGO ELEGIDO
-    public verificarEntradaJuego(entrada: number, cb: () => void) {
+    public verificarEntradaJuego(entrada: number) {
         switch (entrada) {
             case 1: {
-                this.juego= new Digital("digital",20,10);
+                this.juegos[0].iniciarMenuDeOpciones()
                 break;
             }
             case 2: {
-                this.juego= new Analogico("analogico", 20, 2000);
+                this.juegos[1].iniciarMenuDeOpciones()
                 break;
             }
             case 3: {
-                this.juego=new Dado("dados", 20, 2000);
-              
-                
+                this.juegos[2].iniciarMenuDeOpciones()
+                break
             }
             case 4: {
-                this.juego= new Ruleta("ruleta", 20, 2000);
+                this.juegos[3].iniciarMenuDeOpciones()
                 break;
             }
             case 5: {
-                 this.iniciarPrograma();
+                this.iniciarPrograma();
                 break;
             }
             case 6: {
                 console.log(pc.bold("Saliste del casino, Gracias por su visita!"));
-                return;
+                this.setSalir(true)
+                break;
             }
             default: {
                 console.log(pc.magenta(pc.bold("Error Intentelo nuevamente")));
-                cb();
                 break;
             }
-           
+
         }
         return this.getJuego()
     }
@@ -96,14 +119,15 @@ export class Casino implements GestionCasino {
     public elegirJuego() {
         let opcionMenu: number;
         setTimeout(() => {
-            opcionMenu = readlineSync.questionInt(pc.white(pc.bold(`${pc.bgCyanBright("Elija una opcion:")}\n1- Digital.\n2- Analogico.\n3- Dados.\n4- Ruleta.\n5- Menu Principal \n6- Salir.\n`)));
-            this.verificarEntradaJuego(opcionMenu, this.elegirJuego);
-            this.getJuego();
-        }, 3000);
+            do {
+                opcionMenu = readlineSync.questionInt(pc.white(pc.bold(`${pc.bgCyanBright("Elija una opcion:")}\n1- Tragamonedas digital.\n2- Tragamonedas Analogico.\n3- Dados.\n4- Ruleta.\n5- Menu Principal \n6- Salir.\n`)));
+                this.verificarEntradaJuego(opcionMenu);
+            } while (opcionMenu !== 0 && !this.isSalir());
+        }, this.getTiempo());
     }
 
     // FUNCION DE VALIDACION DEL MENU PRINCIPAL
-    private verificarEntradaInicio(entrada: number, cb: () => void): void {
+    private verificarEntradaInicio(entrada: number): void {
         switch (entrada) {
             // MENU OPCIONES
             case 1: {
@@ -118,7 +142,7 @@ export class Casino implements GestionCasino {
             // POR DEFECTO AUTOINVOCARSE PARA MEDIR DE VUELTA
             default: {
                 console.log(pc.magenta(pc.bold("Error Intentelo nuevamente")));
-                cb();
+                ;
                 break;
             }
         }
