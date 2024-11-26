@@ -1,16 +1,19 @@
-import { Casino } from "./Casino";
 import { Tragamoneda } from "./Tragamoneda";
 
-export class Digital extends Tragamoneda {
-    constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
-        super(nombre,apuestaMin, apuestaMax);
-    }
 
-    public retirarTicket(): string{
-        return `Su ticket a sido retirado con el valor de $${this.getCredito()}`;
+export class Analogico extends Tragamoneda {
+
+    public retirarTicket(): void{
+
     }
 
     public apostar(): void{
+
+    }
+    public iniciarJuego(): void{
+
+    }
+    public finalizarJuego(): void{
 
     }
 
@@ -23,10 +26,12 @@ export class Digital extends Tragamoneda {
     }
 
     public cargarCredito(montoCredito: number): string {
+        // this.setCredito(montoCredito);
         if(this.verificarMontoCarga()){
             this.montoCredito+=montoCredito;
             return `Su carga de ${montoCredito} fue un exito!`;
          }
-         return `El monto ingresado no cumple con el rango del juego ${this.getNombre()}`;
+         this.setCredito(0);
+         return `El monto ingresado no cumple con los limites del ${this.getNombre()}`;
     }
 }
