@@ -1,8 +1,8 @@
 import { Juego } from "./Juego";
-import rd from "readline-sync";
+// import rd from "readline-sync";
 
 export class Ruleta extends Juego {
-    private numerosRojos:number[]
+    private numerosRojos:number[];
     private numerosNegros:number[];
 
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
@@ -11,6 +11,8 @@ export class Ruleta extends Juego {
         this.numerosNegros=[2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
     }
 
+
+    //<-------------------------GETTERS Y SETTERS---------------------------------------->
     public getNumerosRojos(): number[] {
         return this.numerosRojos;
     }
@@ -28,9 +30,11 @@ export class Ruleta extends Juego {
     }
 
     public IniciarJuego(): void {
-        this.apostar()
+       
     }
     public calcularPagos(): number{
         return 1;
     }
+
+    // <------------------A PARTIR DE ACA METODOS COMUNES------------------------->
 }
