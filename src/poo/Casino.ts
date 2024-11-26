@@ -76,7 +76,7 @@ export class Casino{
                     case this.juegos.length + 2:
                         console.log(pc.bold("Saliste del casino, ¡Gracias por su visita!"));
                         this.setSalir(true);
-                        break;
+                        return;
                     default:
                         console.log(pc.magenta(pc.bold("Error, inténtelo nuevamente.")));
                         break;
