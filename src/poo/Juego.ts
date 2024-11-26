@@ -4,13 +4,13 @@ import { GestionCasino } from "./interfaceGestionCasino";
 
 // CLASE JUEGO ABSTRACTA
 export abstract class Juego implements GestionCasino {
-    protected nombre: string;
-    protected apuestaMax: number;
-    protected apuestaMin: number;
-    protected montoCredito: number;
+    protected nombre: string; //NOMBRE DEL JUEGO
+    protected apuestaMax: number; //APUESTA MINIMIA DE UN JUEGO
+    protected apuestaMin: number; //APUESTA MAXIMA DE UN JUEGO
+    protected montoCredito: number; //
     protected montoApuesta: number
     protected tiempo: number;
-    private salirJuego: boolean;
+    private salirJuego: boolean; //NOS PERMITE SALIR DEL "do while" CUANDO SEA TRUE.
 
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
         this.nombre = nombre;
@@ -22,10 +22,14 @@ export abstract class Juego implements GestionCasino {
         this.salirJuego = false;
     }
 
+    // <-------------GETTERS Y SETTERS------------------------------------------>
+
+    // GETTER PARA VER NOMBRE JUEGO
     public getNombre(): string {
         return this.nombre;
     }
 
+    // GETTER PARA MODIFICAR NOMBRE JUEGO
     public setNombre(nombre: string): void {
         this.nombre = nombre;
     }
@@ -40,51 +44,58 @@ export abstract class Juego implements GestionCasino {
         this.montoApuesta = cantidadApuesta;
     }
 
-    // GETTER DE CREDITOS EN JUEGO
+    // GETTER PARA VER CREDITOS EN JUEGO
     public getCredito(): number {
         return this.montoCredito;
     }
 
-    // SETTER DE CREDITOS EN JUEGO
+    // SETTER PARA MODIFICAR CREDITOS EN JUEGO
     public setCredito(monto: number): void {
         this.montoCredito = monto;
     }
 
-    // GETTER DE APUESTA MAXIMA
+    // GETTER PARA VER APUESTA MAXIMA
     public getApuestaMax(): number {
         return this.apuestaMax;
     }
 
-    // SETTER DE APUESTA MAXIMA
+    // SETTER PARA MODIFICAR APUESTA MAXIMA
     public setApuestaMax(apuestaMax: number): void {
         this.apuestaMax = apuestaMax;
     }
 
-    // GETTER DE APUESTA MIN
+    // GETTER PARA VER APUESTA MIN
     public getApuestaMin(): number {
         return this.apuestaMin;
     }
 
-    // SETTER DE APUESTA MIN
+    // SETTER PARA MODIFICAR APUESTA MIN
     public setApuestaMin(apuestaMin: number): void {
         this.apuestaMin = apuestaMin;
     }
 
+    // GETTER PARA VER EL TIMPO DE ESPERA
     public getTiempo(): number {
         return this.tiempo;
     }
 
+    // SETTER PARA MODIFICAR TIEMPO DE ESPERA
     public setTiempo(tiempo: number): void {
         this.tiempo = tiempo;
     }
 
+    // GETTER PARA VER VALOR BOOLEANO(setTimeOut)
     public isSalirJuego(): boolean {
         return this.salirJuego;
     }
 
+    // GETTER PARA MODIFICAR VALOR BOOLEANO (setTimeOut)
     public setSalirJuego(salirJuego: boolean): void {
         this.salirJuego = salirJuego;
     }
+
+
+    //<------------------------A PARTIR DE ACA METODOS COMUNES------------------------------------>
 
     // METODO PARA ACTUALIZAR CREDITO EN JUEGO
     public actualizarMontoCredito(apuesta: number): void {
@@ -92,28 +103,26 @@ export abstract class Juego implements GestionCasino {
         this.setCredito(credito);
     }
 
+    // METODO PARA VERIFICAR MONTO DE LA APUESTA
     public verificarMontoApuesta(apuesta: number): boolean {
         return apuesta >= this.getApuestaMin() && apuesta <= this.getApuestaMax() && apuesta <= this.getCredito();
     }
 
-    // VERIFICA EL MONTO DE LA CARGA EVALUANDO EL MINIMO DE CADA JUEGO
-    public verificarMontoCarga(): boolean {
-        return this.getCredito() >= this.getApuestaMin();
+    // METODO PARA VERIFICA EL MONTO DE LA CARGA EVALUANDO EL MINIMO DE CADA JUEGO
+    public verificarMontoCarga(carga:number): boolean {
+        return carga >= this.getApuestaMin();
     }
 
-    // CARGAR Y VERIFICAR EL MONTO INGRESADO
+    // METODO PARA CARGAR Y VERIFICAR EL MONTO INGRESADO
     public verificarCargaCredito(entrada: number): void {
-        if (entrada && this) {
-            console.log(this.cargarCredito(entrada));
-        }
         switch (entrada) {
             case 1: {
                 this.mensajeCarga()
                 break;
             }
             case 2: {
-                console.log(pc.bold("Salió del casino, Gracias por su visita!"));
-                return;
+                this.setSalirJuego(true);
+                break;
             }
             default: {
                 console.log(pc.magenta(pc.bold("Error Intentelo nuevamente")));
@@ -126,6 +135,7 @@ export abstract class Juego implements GestionCasino {
         }
     }
 
+    // METODO PARA PEDIR EN CONSOLA AL USUARIO EL MONTO DE CARGA DE CREDITO DESEADO
     public mensajeCarga(): void {
         let opcionMenu: number;
         setTimeout(() => {
@@ -136,7 +146,7 @@ export abstract class Juego implements GestionCasino {
         }, this.getTiempo());
     }
 
-    // FUNCION DE VALIDACION DE SUBMENU DE OPCIONES
+    // METODO DE VALIDACION DE SUBMENU DE OPCIONES DENTRO DE UN JUEGO
     public verificarEntradaMenuOpciones(entrada: number): void {
         switch (entrada) {
             // CARGAR CREDITO
@@ -144,16 +154,22 @@ export abstract class Juego implements GestionCasino {
                 this.mensajeCarga();
                 break;
             }
-            // JUGAR
+            // VER INSTRUCCION DEL JUEGO EN ESPECIFICO LEYENDO EL TXT
             case 2: {
-                console.log("Presionaste J");
+                console.log("Leyendo instruccion...");
                 break;
             }
-            //SALIR DEL JUEGO
+            // JUGAR 
             case 3: {
+                console.log("Llamar a una funcion que muestre el mensaje de cuanto apostará antes de ejecutar...");
+                break;
+            }
+            //SALIR DEL JUEGO --> VOLVER ATRAS
+            case 4: {
                 this.setSalirJuego(true);
                 return;
             }
+            // ERRORES DE LA ENTRADA
             default: {
                 console.log(pc.magenta(pc.bold("Error Intentelo nuevamente")));;
                 break;
@@ -161,6 +177,7 @@ export abstract class Juego implements GestionCasino {
         }
     }
 
+    // METODO QUE NOS MOSTRARA EN CONSOLA LAS OPCIONES DENTRO DEL JUEGO
     public iniciarMenuDeOpciones() {
         let opcionMenu: number;
         setTimeout(() => {
@@ -171,26 +188,32 @@ export abstract class Juego implements GestionCasino {
         }, this.getTiempo());
     }
 
-    // public salirJuego(): void {
-    //     // AQUI PORDRIAMOS SIMPLEMENTE SALIR DEL JUEGO Y VOLVER A MOSTRAR LISTA DE JUEGOS
-    //     console.log(pc.bold("Haz salido del juego."));
-    //     this.iniciarMenuDeOpciones();
-    // }
 
-    public obtenerEntradaApuesta(): number {
-        let cantidad:number;
-        do{
-            cantidad = readlineSync.questionInt("Ingrese cantidad de dinero a apostar: ");
-        }while(cantidad !== 0 && !this.verificarMontoApuesta(cantidad));
+    // METODO QUE NOS MOSTRARA EN CONSOLA LAS OPCIONES DENTRO DEL JUEGO
+    public obtenerEntradaCarga(): number {
+        let cantidad: number;
+        do {
+            cantidad = readlineSync.questionInt("Ingrese el monto que desea cargar: ");
+        } while (cantidad !== 0 && !this.verificarMontoCarga(cantidad));
         return cantidad;
     }
 
+    // METODO QUE NOS MOSTRARA EN CONSOLA LAS OPCIONES DENTRO DEL JUEGO
+    public obtenerEntradaApuesta(): number {
+        let cantidad: number;
+        do {
+            cantidad = readlineSync.questionInt("Ingrese cantidad de dinero a apostar: ");
+        } while (cantidad !== 0 && !this.verificarMontoApuesta(cantidad));
+        return cantidad;
+    }
+
+    // METODO PARA QUE EN CADA JUEGO SE DETERMINE LAS OPCIONES SEGUN LA JUGABILIDAD
     public obtenerEntradaNum(): number {
         return readlineSync.questionInt("Ingrese una opcion:")
     }
 
     // METODO PARA RETIRAR TICKET
-    public retirarTicket(): void {}
+    public retirarTicket(): void { }
 
     // METODO PARA CARGAR CREDITO AL JUEGO
     public cargarCredito(montoCredito: number): void { }
@@ -205,8 +228,10 @@ export abstract class Juego implements GestionCasino {
         }
     }
 
+    //<------------------------A PARTIR DE ACA METODOS ABSTRACTOS------------------------------------>
+
     abstract calcularPerdida(): number
-    abstract calcularGanancia(): number 
+    abstract calcularGanancia(): number
     abstract IniciarJuego(): void;
     abstract calcularPagos(): number
 }

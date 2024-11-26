@@ -20,6 +20,6 @@ const casino: Casino = new Casino("Casino 'La suerte'");
 
 function main() {
     console.log(pc.bgCyan(pc.bold("**Bienvenido al casino!**\n")));
-    casino.iniciarPrograma();
+    casino.elegirJuego();
 }
 main();
