@@ -3,35 +3,15 @@ import { Tragamoneda } from "./Tragamoneda";
 
 export class Analogico extends Tragamoneda {
 
-    public retirarTicket(): void{
-
+    constructor(){
+        super("Tragamonedas Clasico", 1, 100, 3)
+        this.simbolos = ["7","🔔","☘️","🍋","🍒" ]
     }
 
-    public apostar(): void{
-
-    }
-    public iniciarJuego(): void{
-
-    }
-    public finalizarJuego(): void{
-
-    }
-
-    public calcularGanancia(): number {
-        return 0;
-    }
-
-    public calcularPerdida(): number {
-        return 0;
-    }
-
-    public cargarCredito(montoCredito: number): string {
-        // this.setCredito(montoCredito);
-        if(this.verificarMontoCarga()){
-            this.montoCredito+=montoCredito;
-            return `Su carga de ${montoCredito} fue un exito!`;
-         }
-         this.setCredito(0);
-         return `El monto ingresado no cumple con los limites del ${this.getNombre()}`;
+    calcularPagos(): number {
+        throw new Error("Method not implemented.");
     }
 }
+
+// const analogico = new Analogico
+// analogico.IniciarJuego()

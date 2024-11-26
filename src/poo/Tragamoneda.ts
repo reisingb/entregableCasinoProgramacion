@@ -1,24 +1,55 @@
-/* xport class Tragamoneda {
-    protected nombre: string;
-    protected simbolos: string[];
-    protected carretes: number;
-    constructor(nombre: string, simbolos: string[], carretes: number) {
-        this.nombre = nombre;
-        this.simbolos = simbolos;
-        this.carretes = carretes;
-    }
-} */
 import { Casino } from "./Casino";
 import { Juego } from "./Juego";
+import readlineSync from "readline-sync";
 
 // SUPER CLASE
-export abstract class Tragamoneda extends Juego{    
-    constructor(nombre:string, apustaMax:number, apuestaMin:number){
+export abstract class Tragamoneda extends Juego {
+    protected simbolos: string[] = []
+    protected carretes: number;
+    constructor(nombre: string, apustaMax: number, apuestaMin: number, carretes: number) {
         super(nombre, apustaMax, apuestaMin);
+        this.carretes = carretes
     }
-    // ACCIONES EN COMUN PARA TODOS LOS JUEGOS
-    abstract retirarTicket(): void
-    abstract calcularGanancia(): number;
-    abstract calcularPerdida(): number;
-    abstract apostar(): void
+    //HACER EL METODO CALCULARGANANCIA() EN LOS DOS JUEGOS (tabla de pagos)
+    IniciarJuego(): void {
+        const apuesta = this.obtenerEntradaApuesta();
+        this.apostar(apuesta);
+        console.log("1. Girar rodillos");
+        this.obtenerEntradaNum()
+        this.girar()
+    }
+
+    public girar(): void {
+        console.log("Girando...")
+        setTimeout(() => {
+            this.generarResultadoAleatorio()
+        }, 1000);
+        this.calcularGanancia()
+    }
+
+    public generarResultadoAleatorio(): string[] {
+        const combinacion = [];
+        for (let i = 0; i < this.carretes; i++) {
+            const indiceAleatorio = Math.floor(Math.random() * this.simbolos.length)
+            combinacion.push(this.simbolos[indiceAleatorio])
+        }
+        return combinacion
+    }
+
 }
+
+
+// Consola:
+// *Ingrese cantidad de dinero que desea apostar:
+
+// *1. Girar rodillos
+// *Ingrese una opcion:
+
+// [tragamonedas.girar()
+// girar tiene que tener un console log que diga girando…
+// y luego de un segundo mostrar los simbolos aleatorios
+// if gana console log ha ganado apuesta x n
+// sino console log No ha salido ninguna combinacion ganadora]
+
+// *1. Seguir apostando
+// 2. Retirar ticket 
