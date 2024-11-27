@@ -10,13 +10,21 @@ export abstract class Tragamoneda extends Juego {
         super(nombre, apustaMax, apuestaMin);
         this.carretes = carretes
     }
-    //HACER EL METODO CALCULARGANANCIA() EN LOS DOS JUEGOS (tabla de pagos)
-    IniciarJuego(): void {
-        const apuesta = this.obtenerEntradaApuesta();
-        this.apostar(apuesta);
+    //HACER EL METODO CALCULARGANANCIA() EN LOS DOS JUEGOS (tabla de pagos) 3
+    iniciarJuego(): void {
+        this.obtenerEntradaApuesta();
         console.log("1. Girar rodillos");
-        this.obtenerEntradaNum()
-        this.girar()
+        let opcion:number;
+        do{
+            console.log("1. Girar rodillos");
+            opcion= this.obtenerEntradaNum();
+        }while(opcion !== 1);
+
+        if(opcion === 1){
+            this.girar()
+        }else{
+            console.log("Intente Nuevamente");
+        }
     }
 
     public girar(): void {
