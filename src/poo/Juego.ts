@@ -3,11 +3,11 @@ import pc from "picocolors";
 
 
 // CLASE JUEGO ABSTRACTA
-export abstract class Juego{
+export abstract class Juego {
     protected nombre: string; //NOMBRE DEL JUEGO
     protected apuestaMax: number; //APUESTA MINIMIA DE UN JUEGO
     protected apuestaMin: number; //APUESTA MAXIMA DE UN JUEGO
-    protected montoCredito: number; 
+    protected montoCredito: number;
     private salirJuego: boolean; //NOS PERMITE SALIR DEL "do while" CUANDO SEA TRUE.
 
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
@@ -72,12 +72,13 @@ export abstract class Juego{
 
     //<------------------------A PARTIR DE ACA METODOS COMUNES------------------------------------>
 
-    // METODO PARA ACTUALIZAR CREDITO EN JUEGO
+    // METODO PARA ACTUALIZAR CREDITO AL APOSTAR
     public actualizarMontoCredito(apuesta: number): void {
         const credito = this.getMontoCredito() - apuesta
         this.setMontoCredito(credito);
     }
 
+    // METODO PARA ACTUALIZAR CREDITO AL CARGAR
     public actualizarMontoAct(carga: number): void {
         const credito = this.getMontoCredito() + carga;
         this.setMontoCredito(credito);
@@ -136,14 +137,32 @@ export abstract class Juego{
             this.verificarEntradaMenuOpciones(opcionMenu);
         } while (opcionMenu !== 0 && !this.isSalirJuego());
     }
-    
+
+    // METODO PRIVADO PARA MANEJAR ERRORES DE ENTRADA NUMERICA
+    private mensajeErrorEntrada(condicion: boolean, mensaje: string): void {
+        // MENSAJE AL USUARIO EN CASO DE NO TENER CREDITO.
+        if (condicion) {
+            console.log(pc.red(mensaje));
+            const salir: boolean = readlineSync.keyInYNStrict(pc.bold("Deseas regresar a opciones de juego?: "));
+            if (salir) {
+                this.iniciarMenuDeOpciones();
+            }
+        }
+    }
 
     // METODO QUE NOS PEDIRA EN CONSOLA INGRESAR EL MONTO DE CARGA DE CREDITO EN UN JUEGO
-    public obtenerEntradaCarga(): void{
+    public obtenerEntradaCarga(): void {
         let cantidad: number;
         do {
+            // PEDIR MONTO CARGA
             cantidad = readlineSync.questionInt(pc.bold("Ingrese el monto que desea cargar: "));
-        } while (cantidad !== 0 && !this.verificarMontoCarga(cantidad));
+
+            // ESTABLEZCO CONDICION
+            let condicion: boolean = !this.verificarMontoCarga(cantidad);
+
+            // EJECUTO EL MENSAJE DE ERROR CON SU CONDICION Y MENSAJE ADECUADO
+            this.mensajeErrorEntrada(condicion, `El valor ingresado es menor a minimo de apuesta de el juego ${this.getNombre()}`);
+        } while (!this.verificarMontoCarga(cantidad));
         this.cargarCredito(cantidad);
     }
 
@@ -151,9 +170,16 @@ export abstract class Juego{
     public obtenerEntradaApuesta(): void {
         let entradaApuesta: number;
         do {
+            // PEDIR MONTO APUESTA
             entradaApuesta = readlineSync.questionInt(pc.bold("Ingrese cantidad de dinero a apostar "));
-        } while(entradaApuesta !== 0 && !this.verificarMontoApuesta(entradaApuesta));  
-        
+
+            // GUARDAR CONDICION CONDICION
+            let condicion: boolean = entradaApuesta > this.getMontoCredito();
+
+            // EJECUTO EL MENSAJE DE ERROR CON SU CONDICION Y MENSAJE ADECUADO
+            this.mensajeErrorEntrada(condicion, "No tienes suficiente credito para realizar esta apuesta.");
+        } while (!this.verificarMontoApuesta(entradaApuesta));
+
         this.apostar(entradaApuesta)
     }
 
@@ -161,8 +187,8 @@ export abstract class Juego{
     public obtenerEntradaNum(): number {
         return readlineSync.questionInt(pc.bold("Ingrese una opcion:"))
     }
-     // METODO PARA QUE EN CADA JUEGO SE DETERMINE LAS OPCIONES SEGUN LA JUGABILIDAD TIPO CADENA
-     public obtenerEntradaCadena(): string{
+    // METODO PARA QUE EN CADA JUEGO SE DETERMINE LAS OPCIONES SEGUN LA JUGABILIDAD TIPO CADENA
+    public obtenerEntradaCadena(): string {
         return readlineSync.question(pc.bold("Ingrese una opcion:"))
     }
 
@@ -170,11 +196,7 @@ export abstract class Juego{
     public retirarTicket(): void { }
 
     // METODO PARA CARGAR CREDITO AL JUEGO
-    public cargarCredito(montoCredito: number): void { 
-        if(!this.verificarMontoCarga(montoCredito)){
-            console.log(pc.magenta("Monto no valido"));
-            return;
-        }
+    public cargarCredito(montoCredito: number): void {
         this.actualizarMontoAct(montoCredito);
         console.log(pc.green(`Cargaste $${montoCredito}.\n${pc.bold("Credito disponible: ")} ${this.getMontoCredito()}`))
         this.iniciarMenuDeOpciones();
@@ -182,10 +204,6 @@ export abstract class Juego{
 
     //METODO PARA APOSTAR
     public apostar(apuesta: number): void {
-        if(!this.verificarMontoApuesta(apuesta)){
-            console.log(pc.magenta("Monto no valido"));
-            return;
-        }
         this.actualizarMontoCredito(apuesta);
         console.log(pc.green(`Apostaste ${apuesta}.\n\n${pc.bold("Credito disponible: ")} ${this.getMontoCredito()}`))
     }

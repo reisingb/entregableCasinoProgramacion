@@ -9,7 +9,6 @@ export class Casino {
     private juegos: Juego[]; //LISTA DE JUEGOS
     private nombre: string; //NOMBRE DE CASINO
     private salir: boolean; //NOS PERMITE SALIR DEL "do while" CUANDO SEA TRUE.
-    private tiempo = 2000;
 
     constructor(nombre: string) {
         this.juegos = []; //INICIAR EN ARREGLO VACIO
@@ -44,16 +43,6 @@ export class Casino {
         this.salir = salir;
     }
 
-    // OBTENER EL VALOR DEL TIEMPO (setTimeOut)
-    public getTiempo(): number {
-        return this.tiempo;
-    }
-
-    // MODIFICAR EL VALOR DEL TIEMPO (setTimeOut)
-    public setTiempo(tiempo: number): void {
-        this.tiempo = tiempo;
-    }
-
     //<------------------------A PARTIR DE ACA METODOS COMUNES------------------------------------>
 
     // METODO PARA AGREGAR UN NUEVO JUEGO
@@ -76,14 +65,13 @@ export class Casino {
     }
 
     // MUESTRA OPCIONES DE JUEGO
-   public elegirJuego(): void {
-    let opcionMenu: number;
-    do {
-        opcionMenu = readlineSync.questionInt(
-            pc.white(pc.bold(`${pc.bgCyanBright("Elija una opcion:")}\n1- Tragamonedas Digital.\n2- Tragamonedas Analogico.\n3- Dados.\n4- Ruleta.\n5- Salir del casino.\n`))
-        );
-        this.verificarEntradaJuego(opcionMenu);
-    } while (!this.isSalir());
-}
-
+    public elegirJuego(): void {
+        let opcionMenu: number;
+        do {
+            opcionMenu = readlineSync.questionInt(
+                pc.white(pc.bold(`${pc.bgCyanBright("Elija una opcion:")}\n1- Tragamonedas Digital.\n2- Tragamonedas Analogico.\n3- Dados.\n4- Ruleta.\n5- Salir del casino.\n`))
+            );
+            this.verificarEntradaJuego(opcionMenu);
+        } while (!this.isSalir());
+    }
 }
