@@ -39,7 +39,7 @@ export class Ruleta extends Juego {
         return 0
     }
 
-    iniciarJuego(): void {
+    public iniciarJuego(): void {
         this.obtenerEntradaApuesta();
 
         let opcion: string | number;
@@ -47,7 +47,7 @@ export class Ruleta extends Juego {
         do {
             console.log("1. Elegir color? S/N");
             opcion = this.obtenerEntradaCadena();
-        } while (opcion.toLowerCase() !== "S" || opcion.toLowerCase() !== "N");
+        } while (opcion.toLowerCase() !== "s" && opcion.toLowerCase() !== "n");
 
         do {
             console.log("Elige un color:\n1. Rojo\n2. Negro");
@@ -57,7 +57,7 @@ export class Ruleta extends Juego {
         do {
             console.log("2. Elegir numero? S/N");
             opcion = this.obtenerEntradaCadena();
-        } while (opcion.toLowerCase() !== "S" || opcion.toLowerCase() !== "N");
+        } while (opcion.toLowerCase() !== "s" && opcion.toLowerCase() !== "s");
 
         do {
             console.log("Elige un numero del 0 al 36: ");
@@ -70,6 +70,5 @@ export class Ruleta extends Juego {
     }
 
     // <------------------A PARTIR DE ACA METODOS COMUNES------------------------->
-
 
 }
