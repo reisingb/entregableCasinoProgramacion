@@ -2,6 +2,12 @@ import { Tragamoneda } from "./Tragamoneda";
 
 
 export class Analogico extends Tragamoneda {
+    calcularPerdida(): number {
+        throw new Error("Method not implemented.");
+    }
+    calcularGanancia(): number {
+        throw new Error("Method not implemented.");
+    }
 
     constructor(){
         super("Tragamonedas Clasico", 1, 100, 3)
