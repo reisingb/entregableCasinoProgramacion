@@ -138,58 +138,52 @@ export abstract class Juego {
         } while (opcionMenu !== 0 && !this.isSalirJuego());
     }
 
-    // METODO PRIVADO PARA MANEJAR ERRORES DE ENTRADA NUMERICA
-    private mensajeErrorEntrada(condicion: boolean, mensaje: string): void {
-        // MENSAJE AL USUARIO EN CASO DE NO TENER CREDITO.
-        if (condicion) {
-            console.log(pc.red(mensaje));
-            const salir: boolean = readlineSync.keyInYNStrict(pc.bold("Deseas regresar a opciones de juego?: "));
-            if (salir) {
-                this.iniciarMenuDeOpciones();
-            }
-        }
-    }
-
     // METODO QUE NOS PEDIRA EN CONSOLA INGRESAR EL MONTO DE CARGA DE CREDITO EN UN JUEGO
     public obtenerEntradaCarga(): void {
-        let cantidad: number;
+        let cantidadCarga: number;
+
+        // MIENTRAS NO SE CUMPLA CON EL RANGO DE CARGA DEL JUEGO ---> VOLVER A PREGUNTAR.
         do {
             // PEDIR MONTO CARGA
-            cantidad = readlineSync.questionInt(pc.bold("Ingrese el monto que desea cargar: "));
+            cantidadCarga = this.obtenerEntradaNum("Ingrese el monto que desea cargar: ");
 
-            // ESTABLEZCO CONDICION
-            let condicion: boolean = !this.verificarMontoCarga(cantidad);
+            // VERIFICAR SI EL MONTO CUMPLE CON EL RANGO
+            if (!this.verificarMontoCarga(cantidadCarga)) {
+                console.log(pc.red(`El valor ingresado es menor al minimo de apuesta de el juego ${this.getNombre()}`));
+            }
+        } while (!this.verificarMontoCarga(cantidadCarga));
 
-            // EJECUTO EL MENSAJE DE ERROR CON SU CONDICION Y MENSAJE ADECUADO
-            this.mensajeErrorEntrada(condicion, `El valor ingresado es menor a minimo de apuesta de el juego ${this.getNombre()}`);
-        } while (!this.verificarMontoCarga(cantidad));
-        this.cargarCredito(cantidad);
+        this.cargarCredito(cantidadCarga);
     }
 
     // METODO QUE NOS PEDIRA EN CONSOLA LA CANTIDAD DE DINERO QUE SE APOSTARA EN UN JUEGO
-    public obtenerEntradaApuesta(): void {
+    public obtenerEntradaApuesta(mensaje: string): number {
         let entradaApuesta: number;
+        // MIENTRAS NO SE CUMPLA CON EL RANGO DE APUESTAS DEL JUEGO O CON LA CONDICION OPCIONAL---> VOLVER A PREGUNTAR.
         do {
             // PEDIR MONTO APUESTA
-            entradaApuesta = readlineSync.questionInt(pc.bold("Ingrese cantidad de dinero a apostar "));
-
-            // GUARDAR CONDICION CONDICION
-            let condicion: boolean = entradaApuesta > this.getMontoCredito();
-
-            // EJECUTO EL MENSAJE DE ERROR CON SU CONDICION Y MENSAJE ADECUADO
-            this.mensajeErrorEntrada(condicion, "No tienes suficiente credito para realizar esta apuesta.");
+            entradaApuesta = this.obtenerEntradaNum(mensaje);
+            if (entradaApuesta > this.getMontoCredito()) {
+                console.log(pc.red("No tienes suficiente credito para realizar esta apuesta."));
+            }
+            
         } while (!this.verificarMontoApuesta(entradaApuesta));
 
-        this.apostar(entradaApuesta)
+        return entradaApuesta;
     }
 
     // METODO PARA QUE EN CADA JUEGO SE DETERMINE LAS OPCIONES SEGUN LA JUGABILIDAD TIPO NUMERO
-    public obtenerEntradaNum(): number {
-        return readlineSync.questionInt(pc.bold("Ingrese una opcion:"))
+    public obtenerEntradaNum(mensaje: string): number {
+        return readlineSync.questionInt(pc.bold(mensaje))
     }
     // METODO PARA QUE EN CADA JUEGO SE DETERMINE LAS OPCIONES SEGUN LA JUGABILIDAD TIPO CADENA
-    public obtenerEntradaCadena(): string {
-        return readlineSync.question(pc.bold("Ingrese una opcion:"))
+    public obtenerEntradaCadena(mensaje: string): string {
+        return readlineSync.question(pc.bold(mensaje))
+    }
+
+    // METODO PARA CUANDO EL USUARIO NECESITE SALIR O CONTINUAR MEDIANTE UNA Y/N CON SU MENSAJE ESPECIFICO.
+    public obtenerEntradaSegunKey(mensaje: string): boolean {
+        return readlineSync.keyInYNStrict(pc.bold(mensaje))
     }
 
     // METODO PARA RETIRAR TICKET
@@ -205,12 +199,10 @@ export abstract class Juego {
     //METODO PARA APOSTAR
     public apostar(apuesta: number): void {
         this.actualizarMontoCredito(apuesta);
-        console.log(pc.green(`Apostaste ${apuesta}.\n\n${pc.bold("Credito disponible: ")} ${this.getMontoCredito()}`))
+        console.log(pc.green(`Apostaste ${apuesta}.\n${pc.bold("Credito disponible: ")} ${this.getMontoCredito()}`))
     }
 
     //<------------------------A PARTIR DE ACA METODOS ABSTRACTOS------------------------------------>
-
-    abstract calcularPerdida(): number;
     abstract calcularGanancia(): number;
     abstract iniciarJuego(): void;
     abstract calcularPagos(): number;
