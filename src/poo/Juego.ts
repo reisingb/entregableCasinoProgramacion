@@ -53,19 +53,19 @@ export abstract class Juego {
         this.salirJuego = salirJuego;
     }
 
-    public getApuestas():Apuesta[]{
+    public getApuestas(): Apuesta[] {
         return this.apuestas;
     }
 
-    
-    public setApuestas(apuesta:Apuesta):void{
+
+    public setApuestas(apuesta: Apuesta): void {
         this.apuestas.push(apuesta);
     }
 
     // <------------------------METODOS COMUNES------------------------------------>
 
     // METODO DE VALIDACION DE SUBMENU DENTRO DE UN JUEGO
-    public validarOpcionesJuego(opcion: number, juego: Juego, jugador: Jugador): void {
+    public validarOpcionesJuego(opcion: number, jugador: Jugador): void {
         switch (opcion) {
             case 1: {
                 console.log("Leyendo instruccion txt...");
@@ -76,8 +76,8 @@ export abstract class Juego {
                 break;
             }
             case 3: {
-                juego.setSalirJuego(true);
-                break;
+                this.setSalirJuego(true);
+                return;
             }
             default: {
                 console.log(pc.magenta(pc.bold("Error, intentelo nuevamente")));
@@ -92,7 +92,7 @@ export abstract class Juego {
         let opcionMenu: number;
         do {
             opcionMenu = rd.questionInt(pc.yellow(pc.bold(pc.yellow('1- Ver Instruccion/2- Comenzar Juego/3- Atras: '))));
-            this.validarOpcionesJuego(opcionMenu, this, jugador);
+            this.validarOpcionesJuego(opcionMenu, jugador);
         } while (!this.isSalirJuego());
     }
 

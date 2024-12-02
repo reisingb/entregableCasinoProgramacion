@@ -4,29 +4,25 @@ import { Jugador } from "./Jugador";
 import rd from "readline-sync";
 import pc from "picocolors";
 
-//<-----------------PENSADO PARA UN CASINO FISICO PRESENCIAL-------------------->
+//<-----------------PENSADO PARA UN CASINO ONLINE-------------------->
 
-export class Casino{
+export class Casino {
     private juegos: Juego[]; //LISTA DE JUEGOS
     private nombre: string; //NOMBRE DE CASINO
     private salir: boolean; //NOS PERMITE SALIR DEL "do while" CUANDO SEA TRUE.
-    private jugador:Jugador;
+    private jugadores: Jugador[]; //LISTA DE JUGADORES.
 
-    constructor(nombre: string, jugador:Jugador) {
+    constructor(nombre: string) {
         this.juegos = []; //INICIAR EN ARREGLO VACIO
         this.nombre = nombre;
         this.salir = false;
-        this.jugador=jugador;
+        this.jugadores = [];
     }
 
     //<--------------------GETTERS Y SETTERS------------------------------->//
 
-    public getJugador(): Jugador {
-        return this.jugador;
-    }
-
-    public setJugador(jugadores: Jugador): void {
-        this.jugador = jugadores;
+    public getJugadores(): Jugador[] {
+        return this.jugadores;
     }
 
     // OBTENER EL NOMBRE DEL CASINO
@@ -34,7 +30,7 @@ export class Casino{
         return this.nombre;
     }
 
-    public getJuegos():Juego[]{
+    public getJuegos(): Juego[] {
         return this.juegos;
     }
 
@@ -55,49 +51,139 @@ export class Casino{
 
     //<------------------------A PARTIR DE ACA METODOS COMUNES------------------------------------>
 
-    // METODO PARA AGREGAR UN NUEVO JUEGO
-    public agregarJuego(juego: Juego):void {
+    // METODO PARA AGREGAR UN NUEVO JUEGO A LA LISTA
+    public agregarJuego(juego: Juego): void {
         this.juegos.push(juego);
     }
 
+    // METODO AGREGAR JUGADOR A LA LISTA.
+    public agregarJugador(jugador: Jugador): void {
+        this.jugadores.push(jugador);
+    }
+
     // VERIFICAR EL JUEGO ELEGIDO Y RETORNAR
-    public validarJuegoElegido(opcionElegida:number, jugador:Jugador):number{
-        if(opcionElegida >= 1 && opcionElegida <= this.juegos.length){
+    public validarJuegoElegido(opcionElegida: number, jugador: Jugador): void {
+        let longitudJuegos: number = this.juegos.length;
+        // SI LA OPCION ELEGIDA ESTA ENTRE EL RANGO 1 A LONGITUD DE LISTA DE JUEGOS...
+        if (opcionElegida >= 1 && opcionElegida <= longitudJuegos) {
+            //INICIAR EL JUEGO CORRESPONDIENTE RESTANDOLE 1 PARA ACCEDER AL INDICE CORRESPONDIENTE...
             this.juegos[opcionElegida - 1].iniciarJuego(jugador)
+        } else {
+            switch (opcionElegida) {
+                case longitudJuegos + 1: {
+                    this.mostrarOpcionesCasino(jugador);
+                    break;
+                }
+                default: {
+                    console.log(pc.red("Opcion no valida."));
+                    break;
+                }
+            }
         }
-        return opcionElegida;
+    }
+
+    // VALIDAMOS LAS OPCIONES DEL MENU PRINCIPAL
+    public validarOpcionesMenuPrincipal(opcion: number, jugador: Jugador): void {
+        switch (opcion) {
+            case 1: {
+                this.mostrarJuegos(jugador);
+                break;
+            }
+            case 2: {
+                this.validarOpcionesCarga(jugador);
+                break;
+            }
+            case 3: {
+                this.setSalir(true);
+                return;
+            }
+            default: {
+                console.log(pc.red("Opcion invalida."));
+                break;
+            }
+        }
     }
 
     // VERIFICAR OPCION ELEGIDA AL CARGAR CREDITO
-    private validarOpcionesCarga(jugador:Jugador):void {
-        let opcionMenuPrincipal:number | boolean | string= rd.keyInYNStrict(pc.bold("Deseas cargar credito?: "));
-        if(opcionMenuPrincipal){
-            opcionMenuPrincipal = rd.questionInt(pc.bold("Cuanto deseas Cargar?: "));
-            jugador.cargarCredito(opcionMenuPrincipal);
-            this.mostrarJuegos(jugador);
-        }else{
-            this.mostrarJuegos(jugador);
+    public validarOpcionesCarga(jugador: Jugador): void {
+        let carga: number;
+        // MIENTRAS LA CARGA ES MENOR O IGUAL A CERO
+        do {
+            carga = rd.questionInt(pc.bold("Ingrese el monto a cargar: "));
+            // SI LA CARGA INTENTA SER MENOR O IGUAL A CERO--->MENSAJE ERROR
+            if (carga <= 0) {
+                console.log(pc.red("No puedes cargar un valor menor o igual a cero."));
+            }
+
+        } while (carga <= 0);
+        // AL SALIR DEL WHILE CARGAR...
+        jugador.cargarCredito(carga);
+    }
+
+    // CREAR JUGADOR
+    public crearJugador(): Jugador {
+        let nombre: string;
+
+        // MIENTRAS EL VALOR INGRESADO EN LA ENTRADA DE NOMBRE SEA UN UN NUMERO--->1234567890---->VOLVER  APEDIRLO
+        do {
+            nombre = rd.question("Ingrese su nombre: ");
+            // DEJAR MENSAJE AL USUARIO EN CASO DE INGRESAR UN NUMERO EN VEZ DE LETRAS
+            if (!isNaN(parseInt(nombre))) {
+                console.log(pc.red("Su nombre no puede ser un numero.Volver a intentar"));
+            }
+
+            //-->isNaN(evalua un numero)-->ESPERA COMO ARGUMENTO UN NUMERO POR ESO SE PARSEO A INT PARA VALIDAR LUEGO DE QUE NO SEA UN NUMERO NEGANDO !isNaN(valor).
+        } while (!isNaN(parseInt(nombre)));
+
+        // LUEGO AL SALIR DEL BUCLE
+        let dni: number = rd.questionInt("Ingrese su dni: ");
+        const jugador: Jugador = new Jugador(nombre, dni);
+        return jugador; //RETORNAMOS EL JUGADOR.
+    }
+
+    // MOSTRAR OPCIONES DEL CASINO
+    private mostrarOpcionesCasino(jugador: Jugador): void {
+        let opcion: number;
+        // TERMINARA EL PROGRAMA CUANDO SALIR SEA---->TRUE
+        do {
+            // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
+            opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1.Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir: ")}`);
+            this.validarOpcionesMenuPrincipal(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
+        } while (!this.isSalir());
+        // DESPEDIDA
+        console.log(pc.cyan("Gracias por su visita!, Hasta la proxima! :)"));
+
+    }
+
+    // MOSTRAR JUEGOS DEL CASINO
+    private mostrarJuegos(jugador: Jugador): void {
+        // SI LA LISTA DE JUEGOS TIENE CONTENIDO...
+        if (this.getJuegos().length > 0) {
+            const longitudJuegos: number = this.juegos.length;
+            let numeroAtras: number = longitudJuegos + 1;
+
+            // CREAR UN NUEVO ARREGLO SOLO CON LOS NOMBRES DE JUEGOS.
+            const listaNombres: string = this.juegos.map((juego, i) => {
+                let inicioOpcion = i + 1; //--->ANTES DE RETORNAR GUARDAR LA SUMA DE (I + 1, SABIENDO QUE I ES EL INDICE) --->PARA COMENZAR CON OPCIONES DESDE 1 EN ADELANTE.
+                return `${inicioOpcion}. ${juego.getNombre()}`; //-->RETORNO DE EJEMPLO--> ["1. DADO", "2. RULETA", ETC].
+            }).join("/") //-->MEDIANTE EL JOIN  UNIR LOS ELEMENTO SEPARANDOLOS POR UN "/" CREANDO UN SOLO STRING---> EJEMPLO-->"1. DADO/2. RULETA/ETC."
+
+            let opcion: number;
+            do {
+                // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
+                opcion = rd.questionInt(`${pc.cyan("Elige juego o volver ===>")} ${pc.bold(listaNombres)}/${pc.bold(`${numeroAtras}. Atras:`)} `);
+                this.validarJuegoElegido(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
+            } while (opcion !== 1 && opcion !== 2 && opcion !== 3);
         }
     }
 
     // INICIO PROGRAMA PRINCIPAL
-    public menuPrincipal(jugador:Jugador):void{
-        console.log(pc.bgCyan(pc.bold(`Hola ${jugador.getNombre()}!! Bienvenido al casino!\n`)));
-        console.log(pc.bold(`Tu credito actual es de: ${pc.yellow(jugador.getMontoCredito())}`));
-        this.validarOpcionesCarga(jugador);
-    }
-
-    // MOSTRAR JUEGOS DEL CASINO
-    private mostrarJuegos(jugador:Jugador):void{
-        if(this.getJuegos().length > 0){
-            const listaNombres = this.juegos.map((juego, i) => {
-                let inicioOpcion= i + 1;
-                const convertirPrimerLetraMayus = juego.getNombre().charAt(0).toUpperCase() + juego.getNombre().slice(1);
-                return `${inicioOpcion}. ${convertirPrimerLetraMayus}`;
-            }).join("/")
-           
-            const opcion :number = rd.questionInt(`Elige una opcion de juego ===> ${listaNombres}: `);
-            this.validarJuegoElegido(opcion, jugador);
-        }
+    public menuPrincipal(): void {
+        const nuevoJugador = this.crearJugador(); //EL METODO NOS RETORNABA UN JUGADOR ¿RECUERDAN?---> SE GUARDO EN VARIABLE PARA REFERENCIA.
+        this.agregarJugador(nuevoJugador); //GUARDO EL NUEVO JUGADOR.
+        // DAMOS LA BIENVENIDA EN TERMINAL
+        console.log(pc.bgCyan(pc.bold(`Hola ${nuevoJugador.getNombre()}!, Bienvenido al casino!\n`)));
+        console.log(pc.bold(`Tu saldo actual es: ${pc.yellow(nuevoJugador.getMontoCredito())} creditos.`));
+        this.mostrarOpcionesCasino(nuevoJugador); //----> LLAMAR FUNCION PARA VALIDAR QUE HARÁ EL USUARIO DESDE UN PRINCIPIO.
     }
 }

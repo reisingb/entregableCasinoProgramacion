@@ -10,7 +10,7 @@ export class Ruleta extends Juego {
     private numeros: number[];
 
     constructor() {
-        super("Ruleta", 10, 1000); 
+        super("Ruleta", 10, 10000); 
         this.numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
         this.numerosNegros = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
         this.numeros = [...this.numerosRojos, ...this.numerosNegros];
@@ -55,21 +55,18 @@ export class Ruleta extends Juego {
 
     public opcionesApuestaJuego(jugador: Jugador): void {
         let opcionBoolean:boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un color? "));
-        let tipoApuesta:string = "";
-        let montoApuesta:number;
+        let tipoApuesta:string;
         if (opcionBoolean) {
             tipoApuesta = this.elegirColor();
-            montoApuesta = rd.questionInt(pc.bold(`Ingrese el monto para su apuesta al color ${tipoApuesta}: `));
-            jugador.apostar(montoApuesta, this, tipoApuesta);
+            jugador.apostar(this, tipoApuesta, pc.bold(`Ingrese el monto para su apuesta al color ${tipoApuesta}: `));
         } else {
             tipoApuesta = `${this.elegirNumero()}`;
-            montoApuesta = rd.questionInt(pc.bold(`Ingrese el monto para su apuesta al Numero: ${pc.red(tipoApuesta)}: `));
+            jugador.apostar(this, tipoApuesta, pc.bold(`Ingrese el monto para su apuesta al Numero: ${pc.red(tipoApuesta)}: `));
         }
-
     }
 
     public iniciarJuego(jugador: Jugador): void {
-        console.log(pc.bold(`${pc.yellow(`Has iniciado el juego ${pc.magenta(this.getNombre())}`)}\nCredito: ${pc.yellow(jugador.getMontoCredito())}`));
+        console.log(pc.bold(`${pc.yellow(`Has iniciado el juego ${this.getNombre()}`)}\nSaldo: ${pc.yellow(jugador.getMontoCredito())}`));
         this.menuJuego(jugador);
     }
 
