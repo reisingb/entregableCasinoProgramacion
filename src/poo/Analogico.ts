@@ -1,43 +1,54 @@
 import { Tragamoneda } from "./Tragamoneda";
 import rd from "readline-sync"
 import pc from "picocolors";
+import { Jugador } from "./Jugador";
 
 
 export class Analogico extends Tragamoneda {
 
-    calcularPagos(): number {
-        throw new Error("Method not implemented.");
-    }
-
     constructor() {
-        super("Tragamonedas Clasico", 1, 100, 3)
+        super("Tragamonedas Analogico", 1, 100, 3)
         this.simbolos = ["7", "🔔", "☘️", "🍋", "🍒"]
     }
 
-    iniciarJuego(): void {
-        const apuesta = this.obtenerEntradaApuesta(`Apuesta minima: ${this.getApuestaMin()}. Apuesta maxima: ${this.getApuestaMax()}.\n Credito disponible: ${this.getMontoCredito()}\nIngrese cantidad de dinero que desea apostar: `);
-        this.apostar(apuesta)
+    public iniciarJuego(jugador: Jugador): void {
+        console.log(pc.bold(`${pc.yellow(`Has iniciado el juego ${pc.magenta(this.getNombre())}`)}\nCredito: ${pc.yellow(jugador.getMontoCredito())}`));
+        this.menuJuego(jugador);
+    }
+
+    public opcionesApuestaJuego(jugador: Jugador): void {
+        
+        console.log(`Apuesta minima: ${this.getApuestaMin()}. Apuesta maxima: ${this.getApuestaMax()}.`)
+        let apuesta = jugador.apostar(this);
+
         let opcion: number;
         do {
+            if(this.isSalirJuego()) return;
             console.log("1. Girar rodillos");
             opcion = rd.questionInt(pc.bold("Ingrese opcion: "))
         } while (opcion !== 1);
-        this.girar(apuesta)
-        this.mostrarMenuDespuesDeJuego()
+
+        this.girar(jugador, apuesta)
+        this.mostrarMenuDespuesDeJuego(jugador)
     }
 
-    public girar(apuesta: number): void {
+    public girar(jugador: Jugador, apuesta: number): void {
         console.log("Girando...")
-            let resultado: string[] = this.generarResultadoAleatorio()
-            let mostrarResultado = "|"; //esto puede ser un metodo
-            for (let i = 0; i < resultado.length; i++) {
-                mostrarResultado += `${resultado[i]} |`;
-            }
-            console.log(mostrarResultado);
-            console.log("Ha ganado: " + this.calcularGanancia(resultado, apuesta))
+        let resultado: string[] = this.generarResultadoAleatorio()
+        let mostrarResultado = "|"; //esto puede ser un metodo
+        for (let i = 0; i < resultado.length; i++) {
+            mostrarResultado += `${resultado[i]} |`;
+        }
+        console.log(mostrarResultado);
+        const ganancia: number | null = this.calcularGanancia(apuesta,resultado)
+        console.log("Ha ganado: " + ganancia)
+        if (ganancia !== null && ganancia > 0) {
+            jugador.aumentarSaldo(ganancia);
+        }
     }
 
-    calcularGanancia(resultado: string[], apuesta: number): number {
+    calcularGanancia( apuesta: number,resultado: string[]): number | null{
+        if(resultado){
         if (resultado[0] === "7" && resultado[1] === "7" && resultado[2] === "7") {
             return apuesta * 100;
         } else if (resultado[0] === "🔔" && resultado[1] === "🔔" && resultado[2] === "🔔") {
@@ -67,61 +78,10 @@ export class Analogico extends Tragamoneda {
                 return apuesta * 0.5;
             }
         }
-        return 0;
+        return 0;}
+        return null
     }
 
-    mostrarMenuDespuesDeJuego():void {
-        let opcion: number;
-    do {
-        console.log("\n¿Que desea hacer ahora?");
-        console.log("1. Seguir jugando");
-        console.log("2. Retirar credito");
-        opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
 
-        if (opcion === 1) {
-            console.log(pc.blue("¡A seguir jugando!"));
-            this.iniciarJuego();
-        } else if (opcion === 2) {
-            this.retirarTicket()
-        } else {
-            console.log(pc.red("Opcion invalida. Intente nuevamente."));
-        }
-    } while (opcion !== 1 && opcion !== 2);
-    }
 
-public retirarTicket(): void {
-    this.setMontoCredito(0);
-    console.log(pc.yellow("Retirando credito... ¡Gracias por jugar!"));
 }
-
-    }
-
-
-
-// const analogico = new Analogico
-// analogico.IniciarJuego()
-
-// Consola:
-// *Ingrese cantidad de dinero que desea apostar:
-
-// *1. Girar rodillos
-// *Ingrese una opcion:
-
-// [tragamonedas.girar()
-// girar tiene que tener un console log que diga girando…
-// y luego de un segundo mostrar los simbolos aleatorios
-// if gana console log ha ganado apuesta x n
-// sino console log No ha salido ninguna combinacion ganadora]
-
-//*1. Seguir jugando
-// 2. Retirar ticket
-
-// TABLA DE PAGO:
-// Tres sietes (7-7-7) - Apuesta x100
-// Tres CAMPANAS - Apuesta x30
-// Tres TRÉBOLES - Apuesta x15
-// Tres LIMONES - Apuesta x5
-// Tres CEREZAS - Apuesta x2
-// Cualquier combinación entre CAMPANA-TRÉBOL-LIMÓN - Apuesta x1
-// Dos CEREZAS en cualquier posición - Apuesta x1
-// Una CEREZA - Apuesta x0,5

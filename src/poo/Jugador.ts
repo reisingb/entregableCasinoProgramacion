@@ -53,7 +53,7 @@ export class Jugador {
     }
 
     // AUMENTAR AL CARGAR
-    private aumentarSaldo(carga: number): void {
+    public aumentarSaldo(carga: number): void {
         this.montoCredito += carga;
     }
 
@@ -64,8 +64,9 @@ export class Jugador {
     }
 
     // ACCION DE APOSTAR
-    public apostar(juego: Juego, tipoApuesta: string): void {
+    public apostar(juego: Juego, tipoApuesta?: string): number {
         const apuesta = new Apuesta(this, tipoApuesta);
         apuesta.procesarApuesta(juego); //PROCESAR Y VALIDAR APUESTA
+        return apuesta.getMonto()
     }
 }
