@@ -203,7 +203,7 @@ export abstract class Juego {
     }
 
     //<------------------------A PARTIR DE ACA METODOS ABSTRACTOS------------------------------------>
-    abstract calcularGanancia(): number;
+    // abstract calcularGanancia(): number;
     abstract iniciarJuego(): void;
     abstract calcularPagos(): number;
 }
