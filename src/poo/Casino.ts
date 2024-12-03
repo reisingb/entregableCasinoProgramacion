@@ -69,19 +69,9 @@ export class Casino {
             //INICIAR EL JUEGO CORRESPONDIENTE RESTANDOLE 1 PARA ACCEDER AL INDICE CORRESPONDIENTE...
             this.juegos[opcionElegida - 1].iniciarJuego(jugador)
         } else {
-            if (longitudJuegos + 1) {
+            if (opcionElegida === longitudJuegos + 1) {
                 this.mostrarOpcionesCasino(jugador);
             }
-            // switch (opcionElegida) {
-            //     case longitudJuegos + 1: {
-
-            //         break;
-            //     }
-            //     default: {
-            //         console.log(pc.red("Opcion no valida."));
-            //         break;
-            //     }
-            // }
         }
     }
 
@@ -133,7 +123,7 @@ export class Casino {
             // DEJAR MENSAJE AL USUARIO EN CASO DE INGRESAR UN NUMERO EN VEZ DE LETRAS
             if (!isNaN(parseInt(nombre))) {
                 console.log(pc.red("Su nombre no puede ser un numero.Volver a intentar"));
-            }
+            } 
 
             //-->isNaN(evalua un numero)-->ESPERA COMO ARGUMENTO UN NUMERO POR ESO SE PARSEO A INT PARA VALIDAR LUEGO DE QUE NO SEA UN NUMERO NEGANDO !isNaN(valor).
         } while (!isNaN(parseInt(nombre)));
@@ -150,7 +140,7 @@ export class Casino {
         // TERMINARA EL PROGRAMA CUANDO SALIR SEA---->TRUE
         do {
             // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
-            opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1.Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir: ")}`);
+            opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1.Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir Casino: ")}`);
             this.validarOpcionesMenuPrincipal(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
         } while (!this.isSalir());
     }
@@ -163,7 +153,7 @@ export class Casino {
             let numeroAtras: number = longitudJuegos + 1;
 
             // CREAR UN NUEVO ARREGLO SOLO CON LOS NOMBRES DE JUEGOS.
-            const listaNombres: string = this.juegos.map((juego, i) => {
+            const listaNombres: string = this.juegos.map((juego, i) => { // [] ju1,
                 let inicioOpcion = i + 1; //--->ANTES DE RETORNAR GUARDAR LA SUMA DE (I + 1, SABIENDO QUE I ES EL INDICE) --->PARA COMENZAR CON OPCIONES DESDE 1 EN ADELANTE.
                 return `${inicioOpcion}. ${juego.getNombre()}`; //-->RETORNO DE EJEMPLO--> ["1. DADO", "2. RULETA", ETC].
             }).join("/") //-->MEDIANTE EL JOIN  UNIR LOS ELEMENTO SEPARANDOLOS POR UN "/" CREANDO UN SOLO STRING---> EJEMPLO-->"1. DADO/2. RULETA/ETC."
@@ -172,11 +162,11 @@ export class Casino {
             do {
                 // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
                 opcion = rd.questionInt(`${pc.cyan("Elige juego o volver ===>")} ${pc.bold(listaNombres)}/${pc.bold(`${numeroAtras}. Atras:`)} `);
-                if (opcion !== 1 && opcion !== 2 && opcion !== 3) {
+                if (opcion < 1 || opcion > numeroAtras) {
                     console.log(pc.red("Opcion no valida."));
                 }
                 this.validarJuegoElegido(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
-            } while (opcion !== numeroAtras && !this.jugadores.findIndex((jugador, i) => jugador));
+            } while (opcion < 1 || opcion > numeroAtras);
         }
     }
 

@@ -29,9 +29,9 @@ export class Ruleta extends Juego {
     }
 
     private elegirColor(): string | null {
-        const opcionBoolean:boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un color? "));
-        if (opcionBoolean) {
-            const opcionNumero = rd.questionInt(pc.bold("Elige un color ==>: 1- Rojo / 2- Negro: "));
+        const esApuestaColor:boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un color?: "));
+        if (esApuestaColor) {
+            const opcionNumero:number = rd.questionInt(pc.bold("Elige un color ==> 1. Rojo/2. Negro: "));
             if (opcionNumero === 1) {
                 this.setColorElegido(pc.red("Rojo"));
                 return this.getColorElegido();
@@ -39,7 +39,7 @@ export class Ruleta extends Juego {
                 this.setColorElegido(pc.gray("Negro"));
                 return this.getColorElegido();
             } else {
-                console.log(pc.red("Opción inválida."));
+                console.log(pc.red("Opcion invalida."));
                 return this.elegirColor();
             }
         }
@@ -47,13 +47,13 @@ export class Ruleta extends Juego {
     }
 
     private elegirNumero(): number | null {
-        const opcionBoolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un número? "));
-        if (opcionBoolean) {
+        const esApuestaNumero:boolean= rd.keyInYNStrict(pc.bold("Deseas apostar a un numero?: "));
+        if (esApuestaNumero) {
             let numero: number;
             do {
-                numero = rd.questionInt(pc.bold("Elige un número (0-36): "));
+                numero = rd.questionInt(pc.bold("Elige un numero (0-36): "));
                 if (!this.numeros.includes(numero)) {
-                    console.log(pc.red("Número inválido. Inténtalo nuevamente."));
+                    console.log(pc.red("Numero invalido. Intentalo nuevamente."));
                 }
             } while (!this.numeros.includes(numero));
             return numero;
@@ -62,38 +62,39 @@ export class Ruleta extends Juego {
     }
 
     public opcionesApuestaJuego(jugador: Jugador): void {
-        const color:string | null = this.elegirColor();
-        if (color) {
-            let monto :number= rd.questionInt(`Ingrese el monto para su apuesta al color ${color}: `);
-            jugador.apostar(this, monto, color);
+        if(this.isSalirJuego()) return;
+        const tipoApuestaColor:string | null = this.elegirColor();
+        if (tipoApuestaColor) {
+            jugador.apostar(this, tipoApuestaColor);
+            if(this.isSalirJuego()) return;
 
             const numero:number | null = this.elegirNumero();
-            if (numero !== null) {
-                let monto:number = rd.questionInt(`Ingrese el monto para su apuesta al numero ${pc.red(numero)}: `)
-                jugador.apostar(this, monto, numero.toString());
+            if (numero) {
+                jugador.apostar(this, numero.toString());
+                if(this.isSalirJuego()) return;
             }
+            console.log(pc.bold("La ruleta está girando..."));
             this.girarRuleta();
         } else {
-            const numero = this.elegirNumero();
-            if (numero !== null) {
-                const monto:number =rd.questionInt(`Ingrese el monto para su apuesta al numero ${pc.red(numero)}: `)
-                jugador.apostar(this, monto, numero.toString());
-                this.girarRuleta();
-            } else {
-                console.log(pc.cyan("Hasta la próxima tirada!"));
-            }
+            const tipoApuestaNumero:number | null = this.elegirNumero();
+            if (tipoApuestaNumero) {
+                jugador.apostar(this, tipoApuestaNumero.toString());
+                if(this.isSalirJuego()) return;
+            } 
+            console.log(pc.bold("La ruleta está girando..."));
+            this.girarRuleta();
         }
     }
 
     private girarRuleta(): void {
-        console.log(pc.bold("La ruleta está girando..."));
         const numeroGanador = Math.floor(Math.random() * 37); // 0-36
         const colorGanador = this.numerosRojos.includes(numeroGanador) ? pc.red("Rojo") : this.numerosNegros.includes(numeroGanador) ? pc.gray("Negro") : "Verde";
         console.log(pc.bold(`Numero ganador: ${pc.yellow(numeroGanador.toString())}, Color ganador: ${colorGanador}`));
     }
 
+    // IMPLEMENTACION PARA INICIAR JUEGO
     public iniciarJuego(jugador: Jugador): void {
-        console.log(pc.bold(`${pc.yellow(`Has iniciado el juego ${this.getNombre()}`)}\nSaldo: ${pc.yellow(jugador.getMontoCredito())}`));
+        console.log(pc.bold(`${pc.yellow(`JUEGO ==> ${this.getNombre()}`)}\nSaldo Actual: ${pc.yellow(jugador.getMontoCredito())}`));
         this.menuJuego(jugador);
     }
 
