@@ -1,6 +1,5 @@
 import rd from "readline-sync";
 import pc from "picocolors";
-import { Apuesta } from "./Apuesta";
 import { Jugador } from "./Jugador";
 
 //CLASE JUEGO ABSTRACTA
