@@ -69,16 +69,19 @@ export class Casino {
             //INICIAR EL JUEGO CORRESPONDIENTE RESTANDOLE 1 PARA ACCEDER AL INDICE CORRESPONDIENTE...
             this.juegos[opcionElegida - 1].iniciarJuego(jugador)
         } else {
-            switch (opcionElegida) {
-                case longitudJuegos + 1: {
-                    this.mostrarOpcionesCasino(jugador);
-                    break;
-                }
-                default: {
-                    console.log(pc.red("Opcion no valida."));
-                    break;
-                }
+            if (longitudJuegos + 1) {
+                this.mostrarOpcionesCasino(jugador);
             }
+            // switch (opcionElegida) {
+            //     case longitudJuegos + 1: {
+
+            //         break;
+            //     }
+            //     default: {
+            //         console.log(pc.red("Opcion no valida."));
+            //         break;
+            //     }
+            // }
         }
     }
 
@@ -150,9 +153,6 @@ export class Casino {
             opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1.Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir: ")}`);
             this.validarOpcionesMenuPrincipal(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
         } while (!this.isSalir());
-        // DESPEDIDA
-        console.log(pc.cyan("Gracias por su visita!, Hasta la proxima! :)"));
-
     }
 
     // MOSTRAR JUEGOS DEL CASINO
@@ -172,18 +172,23 @@ export class Casino {
             do {
                 // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
                 opcion = rd.questionInt(`${pc.cyan("Elige juego o volver ===>")} ${pc.bold(listaNombres)}/${pc.bold(`${numeroAtras}. Atras:`)} `);
+                if (opcion !== 1 && opcion !== 2 && opcion !== 3) {
+                    console.log(pc.red("Opcion no valida."));
+                }
                 this.validarJuegoElegido(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
-            } while (opcion !== 1 && opcion !== 2 && opcion !== 3);
+            } while (opcion !== numeroAtras && !this.jugadores.findIndex((jugador, i) => jugador));
         }
     }
 
     // INICIO PROGRAMA PRINCIPAL
     public menuPrincipal(): void {
-        const nuevoJugador = this.crearJugador(); //EL METODO NOS RETORNABA UN JUGADOR ¿RECUERDAN?---> SE GUARDO EN VARIABLE PARA REFERENCIA.
+        const nuevoJugador:Jugador = this.crearJugador(); //EL METODO NOS RETORNABA UN JUGADOR ¿RECUERDAN?---> SE GUARDO EN VARIABLE PARA REFERENCIA.
         this.agregarJugador(nuevoJugador); //GUARDO EL NUEVO JUGADOR.
         // DAMOS LA BIENVENIDA EN TERMINAL
         console.log(pc.bgCyan(pc.bold(`Hola ${nuevoJugador.getNombre()}!, Bienvenido al casino!\n`)));
         console.log(pc.bold(`Tu saldo actual es: ${pc.yellow(nuevoJugador.getMontoCredito())} creditos.`));
         this.mostrarOpcionesCasino(nuevoJugador); //----> LLAMAR FUNCION PARA VALIDAR QUE HARÁ EL USUARIO DESDE UN PRINCIPIO.
+        // DESPEDIDA
+        console.log(pc.cyan("Gracias por su visita!, Hasta la proxima! :)"));
     }
 }

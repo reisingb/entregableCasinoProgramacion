@@ -4,28 +4,16 @@ import { Juego } from "./Juego";
 
 export class Jugador {
     private montoCredito: number;
-    private montoApuesta: number;
-
     private nombre: string;
     private dni: number;
 
     constructor(nombre: string, dni: number) {
         this.montoCredito = 0;
-        this.montoApuesta=0;
         this.nombre = nombre;
         this.dni = dni;
     }
 
     // <-------------------GETTERS Y SETTERS----------------------------->
-
-    // OBTENER MONTO APUESTA
-    public getMontoApuesta(): number {
-        return this.montoApuesta;
-    }
-    // MODIFICAR MONTO APUESTA
-    public setMontoApuesta(montoApuesta: number): void {
-        this.montoApuesta = montoApuesta;
-    }
 
     // OBTENER MONTO CREDITO
     public getMontoCredito(): number {
@@ -76,9 +64,9 @@ export class Jugador {
     }
 
     // ACCION DE APOSTAR
-    public apostar(juego: Juego, tipoApuesta: string, mensajeEntrada: string): void {
-        const apuesta = new Apuesta(this, tipoApuesta);
-        apuesta.procesarApuesta(juego, mensajeEntrada); //PROCESAR Y VALIDAR APUESTA
+    public apostar(juego: Juego, monto:number, tipoApuesta: string): void {
+        const apuesta = new Apuesta(this, monto, tipoApuesta);
+        apuesta.procesarApuesta(juego, monto); //PROCESAR Y VALIDAR APUESTA
     }
 
     // // METODO RETIRAR TICKET (implementación futura)

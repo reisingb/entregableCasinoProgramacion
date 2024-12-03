@@ -8,9 +8,9 @@ export class Apuesta {
     private monto: number;
     private tipoApuesta: string;
 
-    constructor(jugador: Jugador, tipoApuesta: string) {
+    constructor(jugador: Jugador, monto:number, tipoApuesta: string) {
         this.jugador = jugador;
-        this.monto = jugador.getMontoApuesta();
+        this.monto = monto;
         this.tipoApuesta = tipoApuesta;
     }
 
@@ -37,16 +37,17 @@ export class Apuesta {
         this.tipoApuesta = tipoApuesta;
     }
 
+
     // <----------------------------METODOS COMUNES----------------------------------------------->
     // VALIDAR MONTO APUESTA
     public validarMontoApuesta(juego: Juego): boolean {
         return this.getMonto() >= juego.getApuestaMin() && this.getMonto() <= juego.getApuestaMax() && this.getMonto() <= this.jugador.getMontoCredito();
     }
 
-    public procesarApuesta(juego:Juego, mensajeEntrada:string): void {
+    public procesarApuesta(juego:Juego, monto:number): void {
         // MIENTRAS APUESTA NO CUMPLA CON LOS REQUISITOS DE APUESTA
         do{
-            this.setMonto(rd.questionInt(pc.bold(mensajeEntrada)))
+            this.setMonto(monto);
             if (this.getMonto() > this.jugador.getMontoCredito() && this.getMonto() < juego.getApuestaMax()) {
                 console.log(`${pc.yellow(`Saldo insuficiente`)}\n${pc.bold(`Su saldo actual es de: ${this.jugador.getMontoCredito()}`)}`);
                 
@@ -66,4 +67,5 @@ export class Apuesta {
         console.log(pc.green(`${this.jugador.getNombre()} aposto ${this.getMonto()} creditos`));
         console.log(pc.bold(`Saldo actual: ${pc.yellow(this.jugador.getMontoCredito())}`));
     }
+
 }

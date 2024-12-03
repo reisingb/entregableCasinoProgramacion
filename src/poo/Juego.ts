@@ -72,7 +72,7 @@ export abstract class Juego {
                 break;
             }
             case 2: {
-                this.opcionesApuestaJuego(jugador);
+                this.opcionesApuestaJuego(jugador); //ABSTRACTO
                 break;
             }
             case 3: {
