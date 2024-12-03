@@ -43,7 +43,6 @@ export abstract class Tragamoneda extends Juego {
         }
         return combinacion
     }
-
 }
 
 

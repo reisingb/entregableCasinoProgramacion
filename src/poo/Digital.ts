@@ -1,7 +1,7 @@
 import { Casino } from "./Casino";
-import { Tragamoneda } from "./Tragamoneda";
+// import { Tragamoneda } from "./Tragamoneda";
 
-/* export class Digital extends Tragamoneda {
+export class Digital extends Tragamoneda {
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
         super(nombre,apuestaMin, apuestaMax);
     }
@@ -29,4 +29,4 @@ import { Tragamoneda } from "./Tragamoneda";
          }
          return `El monto ingresado no cumple con el rango del juego ${this.getNombre()}`;
     }
-} */
+} 
