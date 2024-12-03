@@ -9,14 +9,12 @@ export abstract class Juego {
     protected apuestaMax: number; // APUESTA MINIMA
     protected apuestaMin: number; // APUESTA MAXIMA
     private salirJuego: boolean; // NOS PERMITE SALIR DEL "do while" CUANDO SEA TRUE.
-    private apuestas: Apuesta[];
 
     constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
         this.nombre = nombre;
         this.apuestaMax = apuestaMax;
         this.apuestaMin = apuestaMin;
         this.salirJuego = false;
-        this.apuestas = [];
     }
 
     // <-------------------------GETTERS Y SETTERS----------------------------------------->
@@ -53,15 +51,6 @@ export abstract class Juego {
         this.salirJuego = salirJuego;
     }
 
-    public getApuestas(): Apuesta[] {
-        return this.apuestas;
-    }
-
-
-    public setApuestas(apuesta: Apuesta): void {
-        this.apuestas.push(apuesta);
-    }
-
     // <------------------------METODOS COMUNES------------------------------------>
 
     // METODO DE VALIDACION DE SUBMENU DENTRO DE UN JUEGO
@@ -72,8 +61,9 @@ export abstract class Juego {
                 break;
             }
             case 2: {
+                this.setSalirJuego(false);
                 this.opcionesApuestaJuego(jugador); //ABSTRACTO
-                break;
+                return;
             }
             case 3: {
                 this.setSalirJuego(true);
@@ -91,7 +81,7 @@ export abstract class Juego {
     public menuJuego(jugador: Jugador): void {
         let opcionMenu: number;
         do {
-            opcionMenu = rd.questionInt(pc.yellow(pc.bold(pc.yellow('1- Ver Instruccion/2- Comenzar Juego/3- Atras: '))));
+            opcionMenu = rd.questionInt(pc.yellow(pc.bold(pc.yellow('1. Ver Instruccion/2. Comenzar Juego/3. Salir Juego: '))));
             this.validarOpcionesJuego(opcionMenu, jugador);
         } while (!this.isSalirJuego());
     }

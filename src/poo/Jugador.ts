@@ -64,16 +64,8 @@ export class Jugador {
     }
 
     // ACCION DE APOSTAR
-    public apostar(juego: Juego, monto:number, tipoApuesta: string): void {
-        const apuesta = new Apuesta(this, monto, tipoApuesta);
-        apuesta.procesarApuesta(juego, monto); //PROCESAR Y VALIDAR APUESTA
+    public apostar(juego: Juego, tipoApuesta: string): void {
+        const apuesta = new Apuesta(this, tipoApuesta);
+        apuesta.procesarApuesta(juego); //PROCESAR Y VALIDAR APUESTA
     }
-
-    // // METODO RETIRAR TICKET (implementación futura)
-    // public retirarTicket(): void {
-    //     // IMPLEMENTAR LOGICA PARA RETIRAR TICKET
-    //     if(this.getMontoCredito() > 0){
-    //         console.log(``);
-    //     }
-    // }
 }
