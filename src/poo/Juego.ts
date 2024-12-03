@@ -1,6 +1,5 @@
 import rd from "readline-sync";
 import pc from "picocolors";
-import { Apuesta } from "./Apuesta";
 import { Jugador } from "./Jugador";
 
 //CLASE JUEGO ABSTRACTA
@@ -52,6 +51,25 @@ export abstract class Juego {
     }
 
     // <------------------------METODOS COMUNES------------------------------------>
+    
+    // METODO PARA MOSTRAR UN MENU CUANDO TERMINA EL JUEGO
+    public mostrarMenuDespuesDeJuego(jugador: Jugador): void {
+        let opcion: number;
+        do {
+            console.log("\n¿Que desea hacer ahora?");
+            console.log("1. Seguir jugando/ 2. Ir a menu del juego");
+            opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
+
+            if (opcion === 1) {
+                console.log(pc.blue("¡A seguir jugando!"));
+                this.opcionesApuestaJuego(jugador);
+            } else if (opcion === 2) {
+                this.menuJuego(jugador)
+            } else {
+                console.log(pc.red("Opcion invalida. Intente nuevamente."));
+            }
+        } while (opcion !== 1 && opcion !== 2);
+    }
 
     // METODO DE VALIDACION DE SUBMENU DENTRO DE UN JUEGO
     public validarOpcionesJuego(opcion: number, jugador: Jugador): void {
@@ -89,5 +107,5 @@ export abstract class Juego {
     // <------------------------METODOS ABSTRACTOS------------------------------------>
     abstract iniciarJuego(jugador: Jugador): void;
     abstract opcionesApuestaJuego(jugador: Jugador): void;
-    abstract calcularGanancia(): number;
+    abstract calcularGanancia(apuesta:number,resultado?: string[]): number | null;
 }

@@ -6,12 +6,14 @@ import rd from "readline-sync";
 export class Apuesta {
     private jugador: Jugador;
     private monto: number;
-    private tipoApuesta: string;
+    private tipoApuesta?: string;
 
-    constructor(jugador: Jugador, tipoApuesta: string) {
+    constructor(jugador: Jugador, tipoApuesta?: string) {
         this.jugador = jugador;
         this.monto = 0;
-        this.tipoApuesta = tipoApuesta;
+        if (this.tipoApuesta !== undefined) {
+            this.tipoApuesta = tipoApuesta;
+        }
     }
 
     // <-----------------------GETTERS Y SETTERS------------------------------------>
@@ -29,8 +31,11 @@ export class Apuesta {
         this.monto = apuesta;
     }
 
-    public getTipoApuesta(): string {
-        return this.tipoApuesta;
+    public getTipoApuesta(): string | null {
+        if (this.tipoApuesta) {
+            return this.tipoApuesta;
+        }
+        return null
     }
 
     public setTipoApuesta(tipoApuesta: string): void {
