@@ -140,7 +140,7 @@ export class Casino {
         // TERMINARA EL PROGRAMA CUANDO SALIR SEA---->TRUE
         do {
             // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
-            opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1.Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir Casino: ")}`);
+            opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1. Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir Casino: ")}`);
             this.validarOpcionesMenuPrincipal(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
         } while (!this.isSalir());
     }
@@ -175,7 +175,7 @@ export class Casino {
         const nuevoJugador:Jugador = this.crearJugador(); //EL METODO NOS RETORNABA UN JUGADOR ¿RECUERDAN?---> SE GUARDO EN VARIABLE PARA REFERENCIA.
         this.agregarJugador(nuevoJugador); //GUARDO EL NUEVO JUGADOR.
         // DAMOS LA BIENVENIDA EN TERMINAL
-        console.log(pc.bgCyan(pc.bold(`Hola ${nuevoJugador.getNombre()}!, Bienvenido al casino!\n`)));
+        console.log(pc.bold(`Hola ${nuevoJugador.getNombre()}!, Bienvenido al casino!🎰🎰🎰\n`));
         console.log(pc.bold(`Tu saldo actual es: ${pc.yellow(nuevoJugador.getMontoCredito())} creditos.`));
         this.mostrarOpcionesCasino(nuevoJugador); //----> LLAMAR FUNCION PARA VALIDAR QUE HARÁ EL USUARIO DESDE UN PRINCIPIO.
         // DESPEDIDA

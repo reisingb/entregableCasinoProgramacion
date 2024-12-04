@@ -70,7 +70,7 @@ export class Apuesta {
         }
         // SI SALE DE LAS CONDICIONES, RESTAR SALDO Y PROCESAR LA APUESTA
         this.jugador.restarSaldoActual(this.getMonto());
-        console.log(pc.green(`${this.jugador.getNombre()} apostó ${this.getMonto()} créditos`));
-        console.log(pc.bold(`Saldo actual: ${pc.yellow(this.jugador.getMontoCredito())}`));
+        console.log(pc.green(`Has apostado ${this.getMonto()} creditos.`));
+        console.log(pc.bold(`Saldo actual: ${pc.gray(this.jugador.getMontoCredito())}`));
     }
 }
