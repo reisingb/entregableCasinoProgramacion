@@ -1,57 +1,82 @@
 import { Casino } from "./Casino";
 import { Juego } from "./Juego";
-import { Jugador } from "./Jugador";
-import { Apuesta } from "./Apuesta";
-import pc from "picocolors";
 
 
     export class Dado extends Juego {
-        private cantidadDados: number; // Número de dados que se lanzan
-        private resultadoDeseado: number; // Resultado objetivo para ganar
-    
-        constructor(nombre: string, apuestaMin: number, apuestaMax: number, cantidadDados: number, resultadoDeseado: number) {
+        calcularPagos(): number {
+            return this.calcularGanancia();
+        };
+        
+        private montoApuesta:number;
+        iniciarJuego(): void {
+            console.log(`bienvenido al juego de Dados ${this.tirarDado}`)
+        }
+       
+
+        
+        constructor(nombre: string, apuestaMin: number, apuestaMax: number,montoApuesta:number) {
             super(nombre, apuestaMin, apuestaMax);
-            this.cantidadDados = cantidadDados;
-            this.resultadoDeseado = resultadoDeseado;
+            this.montoApuesta= 10;
         }
     
-        // Iniciar el juego (se llama desde el menú del casino)
-        public iniciarJuego(jugador: Jugador): void {
-            console.log(pc.cyan(`¡Bienvenido a ${this.getNombre()}!`));
-            console.log(pc.green(`El objetivo es obtener un resultado total mayor o igual a ${this.resultadoDeseado}.`));
-            this.menuJuego(jugador); // Muestra el menú del juego
-        }
-    
-        // Opciones específicas del juego
-        public opcionesApuestaJuego(jugador: Jugador): void {
-            const apuesta = new Apuesta(jugador, "Dado");
-            apuesta.procesarApuesta(this); // Procesar la apuesta ingresada por el jugador
-    
-            // Simular tirada de dados
-            console.log(pc.bold(`Tirando ${this.cantidadDados} dado(s)...`));
-            let resultadoTotal = 0;
-            for (let i = 0; i < this.cantidadDados; i++) {
-                const resultado = Math.floor(Math.random() * 6) + 1; // Número entre 1 y 6
-                console.log(pc.yellow(`Dado ${i + 1}: ${resultado}`));
-                resultadoTotal += resultado;
+        public apostar(): void {
+            if (this.montoApuesta < this.apuestaMin || this.montoApuesta > this.apuestaMax) {
+                console.log(`Error: La apuesta debe estar entre ${this.apuestaMin} y ${this.apuestaMax}.`);
+                return;
+            }
+            if (this.montoApuesta > this.montoCredito) {
+                console.log(`Error: No tienes suficiente crédito para esta apuesta.`);
+                return;
             }
     
-            console.log(pc.bold(`Resultado total: ${resultadoTotal}`));
+            console.log(`Tirando los dados con un monto de ${this.montoApuesta}...`);
+            const dado1 = this.tirarDado();
+            const dado2 = this.tirarDado();
+            const suma = dado1 + dado2;
     
-            // Verificar si el jugador gana
-            if (resultadoTotal >= this.resultadoDeseado) {
-                const ganancia = apuesta.getMonto() * 2; // Gana el doble de su apuesta
-                console.log(pc.green(`¡Felicidades! Ganaste ${ganancia} créditos.`));
-                jugador.cargarCredito(ganancia);
+            console.log(`Resultados: dado1 = ${dado1}, dado2 = ${dado2}, suma = ${suma}`);
+    
+            if (suma === 7 || suma === 11) {
+                const ganancia = this.calcularGanancia();
+                this.montoCredito += ganancia;
+                console.log(`¡Ganaste! Ganaste ${ganancia} créditos. Tu nuevo saldo es: ${this.montoCredito}`);
             } else {
-                console.log(pc.red("Lo siento, perdiste esta ronda."));
+                const perdida = this.calcularPerdida();
+                this.montoCredito -= perdida;
+                console.log(`Perdiste ${perdida} créditos. Tu nuevo saldo es: ${this.montoCredito}`);
             }
     
-            console.log(pc.bold(`Tu saldo actual es: ${pc.yellow(jugador.getMontoCredito())} créditos.`));
+            if (this.montoCredito <= 0) {
+                console.log("Te quedaste sin crédito. Gracias por jugar.");
+            }
         }
+    
+        private tirarDado(): number {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+    
+        public calcularPerdida(): number {
+            return this.montoApuesta; // El jugador pierde lo que apostó.
+        }
+    
         public calcularGanancia(): number {
-            return 0;
+            return this.montoApuesta * 2; // El jugador duplica su apuesta si gana.
+        }
+    
+        public retirarTicket(): void {
+            console.log(`Retiraste un ticket con ${this.montoCredito} créditos. ¡Gracias por jugar!`);
+            this.montoCredito = 0; // Resetea el crédito después de retirar el ticket.
+        }
+    
+        public cargarCredito(montoCredito: number): string {
+            this.actualizarMontoAct(montoCredito);
+            if (this.verificarMontoCarga(0)) {
+                this.montoCredito += montoCredito;
+                return `Su carga de ${montoCredito} créditos fue un éxito. Saldo actual: ${this.montoCredito}`;
+            }
+            this.actualizarMontoAct(0);
+            return `Error:\nPara el juego ${this.getNombre()} el mínimo/máximo es:\nMínimo ${this.getApuestaMin()} - Máximo ${this.getApuestaMax()}\nInténtelo nuevamente.`;
         }
     }
-     
+    
 
