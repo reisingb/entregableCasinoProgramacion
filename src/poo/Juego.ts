@@ -99,7 +99,7 @@ export abstract class Juego {
     public menuJuego(jugador: Jugador): void {
         let opcionMenu: number;
         do {
-            opcionMenu = rd.questionInt(pc.yellow(pc.bold(pc.yellow('1. Ver Instruccion/2. Comenzar Juego/3. Salir Juego: '))));
+            opcionMenu = rd.questionInt(pc.yellow(pc.bold(pc.magenta('1. Ver Instruccion/2. Comenzar Juego/3. Salir Juego: '))));
             this.validarOpcionesJuego(opcionMenu, jugador);
         } while (!this.isSalirJuego());
     }
