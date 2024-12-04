@@ -1,4 +1,5 @@
 import { Casino } from "./poo/Casino";
+import { Dado } from "./poo/Dado";
 /* import { Digital } from "./poo/Digital"; */
 import { Analogico } from "./poo/Analogico";
 // import { Dado } from "./poo/Dado";
@@ -10,10 +11,9 @@ const casino: Casino = new Casino("Casino 'La suerte'");
 // CREACION DE JUEGOS
 /* const digital: Digital = new Digital("digital", 20, 10); */
 const analogico: Analogico = new Analogico();
-// const dado: Dado = new Dado("dados", 20, 2000,10);
+ const dado: Dado = new Dado("dados", 20, 5,2,8);
 const ruleta: Ruleta = new Ruleta();
 casino.agregarJuego(ruleta);
 casino.agregarJuego(analogico);
-// casino.agregarJuego(dado);
+casino.agregarJuego(dado);
 casino.menuPrincipal();
-
