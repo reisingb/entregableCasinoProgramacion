@@ -2,21 +2,17 @@ import { Tragamoneda } from "./Tragamoneda";
 import rd from "readline-sync"
 import pc from "picocolors";
 import { Jugador } from "./Jugador";
+import { ICalculoGanancia } from "./ICalculoGanancia";
 
 
-export class Analogico extends Tragamoneda {
+export class Analogico extends Tragamoneda implements ICalculoGanancia{
 
     constructor() {
         super("Tragamonedas Analogico", 1, 100, 3)
         this.simbolos = ["7", "🔔", "☘️", "🍋", "🍒"]
     }
 
-    public iniciarJuego(jugador: Jugador): void {
-        console.log(pc.bold(`${pc.yellow(`Has iniciado el juego ${pc.magenta(this.getNombre())}`)}\nCredito: ${pc.yellow(jugador.getMontoCredito())}`));
-        this.menuJuego(jugador);
-    }
-
-    public opcionesApuestaJuego(jugador: Jugador): void {
+    public jugar(jugador: Jugador): void {
         
         console.log(`Apuesta minima: ${this.getApuestaMin()}. Apuesta maxima: ${this.getApuestaMax()}.`)
         let apuesta = jugador.apostar(this);
@@ -81,7 +77,4 @@ export class Analogico extends Tragamoneda {
         return 0;}
         return null
     }
-
-
-
 }

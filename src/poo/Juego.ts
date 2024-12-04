@@ -3,7 +3,7 @@ import pc from "picocolors";
 import { Jugador } from "./Jugador";
 
 //CLASE JUEGO ABSTRACTA
-export abstract class Juego {
+export abstract class Juego{
     protected nombre: string; // NOMBRE DEL JUEGO
     protected apuestaMax: number; // APUESTA MINIMA
     protected apuestaMin: number; // APUESTA MAXIMA
@@ -62,7 +62,7 @@ export abstract class Juego {
 
             if (opcion === 1) {
                 console.log(pc.blue("¡A seguir jugando!"));
-                this.opcionesApuestaJuego(jugador);
+                this.jugar(jugador);
             } else if (opcion === 2) {
                 this.menuJuego(jugador)
             } else {
@@ -80,7 +80,7 @@ export abstract class Juego {
             }
             case 2: {
                 this.setSalirJuego(false);
-                this.opcionesApuestaJuego(jugador); //ABSTRACTO
+                this.jugar(jugador); //ABSTRACTO
                 return;
             }
             case 3: {
@@ -104,8 +104,12 @@ export abstract class Juego {
         } while (!this.isSalirJuego());
     }
 
+    // IMPLEMENTACION PARA INICIAR JUEGO
+    public iniciarMenuJuego(jugador: Jugador): void {
+        console.log(pc.bold(`${pc.yellow(`Has iniciado el Juego 🎰 ==> ${pc.bold(this.getNombre())}`)}\nSaldo Actual: ${pc.yellow(jugador.getMontoCredito())}`));
+        this.menuJuego(jugador);
+    }
+
     // <------------------------METODOS ABSTRACTOS------------------------------------>
-    abstract iniciarJuego(jugador: Jugador): void;
-    abstract opcionesApuestaJuego(jugador: Jugador): void;
-    abstract calcularGanancia(apuesta:number,resultado?: string[]): number | null;
+    abstract jugar(jugador: Jugador): void;
 }
