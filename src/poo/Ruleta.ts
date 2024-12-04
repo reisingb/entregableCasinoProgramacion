@@ -3,8 +3,9 @@ import pc from "picocolors";
 import rd from "readline-sync";
 import { Jugador } from "./Jugador";
 
+
 // JUEGO RULETA
-export class Ruleta extends Juego {
+export class Ruleta extends Juego{
     private colorElegido: string | null;
     private numeroElegido: number | null;
     private numerosRojos: number[];
@@ -110,7 +111,7 @@ export class Ruleta extends Juego {
     }
 
     // METODO GIRAR RULETA
-    private girarRuleta(): number {
+    private girar(): number {
         const numeroGanador = Math.floor(Math.random() * 37); // 0-36
         const colorGanador = this.numerosRojos.includes(numeroGanador) ? pc.red("Rojo") : this.numerosNegros.includes(numeroGanador) ? pc.gray("Negro") : pc.green("Verde");
         console.log(pc.bold(`Numero ganador: ${pc.yellow(numeroGanador.toString())}\nColor ganador: ${colorGanador}`));
@@ -120,7 +121,7 @@ export class Ruleta extends Juego {
     // <------------------------------------METODOS A IMPLEMENTAR---------------------------------->
 
     // METODO A IMPLEMENTAR DE OPCIONES DE APUESTAS
-    public opcionesApuestaJuego(jugador: Jugador): void {
+    public jugar(jugador: Jugador): void {
         if (this.isSalirJuego()) return;
 
         const tipoApuestaColor: string | null = this.elegirColor();
@@ -141,7 +142,7 @@ export class Ruleta extends Juego {
                 if (this.isSalirJuego()) return;
 
                 console.log(pc.bold("La ruleta esta girando..."));
-                const ganador = this.girarRuleta();
+                const ganador = this.girar();
                 this.setNumeroGanador(ganador);
                 ganancia += this.calcularGanancia(apuestaColor, ["color"]);
                 if (this.esNumeroGanador(ganador)) {
@@ -151,7 +152,7 @@ export class Ruleta extends Juego {
                 this.validarGanancia(ganancia, jugador);
             } else {
                 console.log(pc.bold("La ruleta esta girando..."));
-                const ganador = this.girarRuleta();
+                const ganador = this.girar();
                 this.setNumeroGanador(ganador);
                 ganancia += this.calcularGanancia(apuestaColor, ["color"]);
                 this.validarGanancia(ganancia, jugador);
@@ -167,19 +168,13 @@ export class Ruleta extends Juego {
                 if (this.isSalirJuego()) return;
 
                 console.log(pc.bold("La ruleta esta girando..."));
-                const ganador = this.girarRuleta();
+                const ganador = this.girar();
                 this.setNumeroGanador(ganador);
                 ganancia += this.calcularGanancia(apuestaNumero, ["numero"]);
                 this.validarGanancia(ganancia, jugador);
             }
         }
         this.mostrarMenuDespuesDeJuego(jugador);
-    }
-
-    // IMPLEMENTACION PARA INICIAR JUEGO
-    public iniciarJuego(jugador: Jugador): void {
-        console.log(pc.bold(`${pc.yellow(`Has iniciado el Juego 🎰 ==> ${pc.bold(this.getNombre())}`)}\nSaldo Actual: ${pc.yellow(jugador.getMontoCredito())}`));
-        this.menuJuego(jugador);
     }
 
     // METODO DE CALCULO DE GANANCIA
