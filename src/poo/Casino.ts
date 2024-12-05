@@ -67,7 +67,7 @@ export class Casino {
         // SI LA OPCION ELEGIDA ESTA ENTRE EL RANGO 1 A LONGITUD DE LISTA DE JUEGOS...
         if (opcionElegida >= 1 && opcionElegida <= longitudJuegos) {
             //INICIAR EL JUEGO CORRESPONDIENTE RESTANDOLE 1 PARA ACCEDER AL INDICE CORRESPONDIENTE...
-            this.juegos[opcionElegida - 1].iniciarJuego(jugador)
+            this.juegos[opcionElegida - 1].iniciarMenuJuego(jugador)
         } else {
             if (opcionElegida === longitudJuegos + 1) {
                 this.mostrarOpcionesCasino(jugador);
