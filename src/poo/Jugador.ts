@@ -64,8 +64,8 @@ export class Jugador {
     }
 
     // ACCION DE APOSTAR
-    public apostar(juego: Juego, tipoApuesta?: string): number {
-        const apuesta = new Apuesta(this, tipoApuesta);
+    public apostar(juego: Juego): number {
+        const apuesta = new Apuesta(this);
         apuesta.procesarApuesta(juego); //PROCESAR Y VALIDAR APUESTA
         return apuesta.getMonto()
     }

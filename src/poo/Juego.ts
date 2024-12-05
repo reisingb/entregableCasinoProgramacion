@@ -75,7 +75,7 @@ export abstract class Juego{
     public validarOpcionesJuego(opcion: number, jugador: Jugador): void {
         switch (opcion) {
             case 1: {
-                console.log("Leyendo instruccion txt...");
+                this.mostrarInstrucciones();
                 break;
             }
             case 2: {
@@ -112,4 +112,5 @@ export abstract class Juego{
 
     // <------------------------METODOS ABSTRACTOS------------------------------------>
     abstract jugar(jugador: Jugador): void;
+    abstract mostrarInstrucciones(): void;
 }
