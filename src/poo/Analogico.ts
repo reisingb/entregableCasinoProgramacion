@@ -11,7 +11,7 @@ import { resolve } from "node:path";
 export class Analogico extends Tragamoneda implements IJuego {
     constructor() {
         super("Tragamonedas Analogico", 1, 100, 3)
-        this.simbolos = ["7", "🔔", "☘️", "🍋", "🍒"]
+        this.simbolos = [`${pc.red(pc.bold("7"))}`, "🔔", "☘️", "🍋", "🍒"]
     }
 
     public jugar(jugador: Jugador): void {
@@ -31,7 +31,7 @@ export class Analogico extends Tragamoneda implements IJuego {
     }
 
     public girar(jugador: Jugador, apuesta: number): void {
-        console.log("Girando...")
+        console.log(`\n${pc.bold("Girando...")}\n`)
         let resultado: string[] = this.generarResultadoAleatorio()
         let mostrarResultado = "|"; //esto puede ser un metodo
         for (let i = 0; i < resultado.length; i++) {
@@ -39,10 +39,13 @@ export class Analogico extends Tragamoneda implements IJuego {
         }
         console.log(mostrarResultado);
         const ganancia: number | null = this.calcularGanancia(apuesta, resultado)
-        console.log("Ha ganado: " + ganancia)
         if (ganancia !== null && ganancia > 0) {
+            console.log(`\nHa ganado: ${pc.yellow(pc.bold(ganancia))}\n${pc.yellow("¡Estas con suerte!")}`)
             jugador.aumentarSaldo(ganancia);
+        } else {
+            console.log(`${pc.cyan("\nNo has tenido suerte, pero puedes seguir intentando.")}`)
         }
+        console.log(`Saldo actual: ${pc.yellow(pc.bold(jugador.getMontoCredito()))}`)
     }
 
     calcularGanancia(apuesta: number, resultado: string[]): number | null {
@@ -73,7 +76,7 @@ export class Analogico extends Tragamoneda implements IJuego {
                 if (contadorCerezas === 2) {
                     return apuesta * 1;
                 } else if (contadorCerezas === 1) {
-                    return apuesta * 0.5;
+                    return apuesta * 1;
                 }
             }
             return 0;
@@ -83,12 +86,12 @@ export class Analogico extends Tragamoneda implements IJuego {
 
     // ESCRIBIR EN TXT INSTRUCCIONES DEL JUEGO
     crearInstruccion(): void {
-        let instrucciones = "1. De forma opcional elige un color, un numero o ambos.\n2. Por cada opcion debes elegir tu apuesta.\n3. Luego de la eleccion a tu apuesta especificar tu monto.\n4. !A ganar!"
+        let instrucciones = "Este Tragamonedas tiene 3 rodillos y una única línea de pago. Existen diferentes símbolos, y cada combinación ofrece un premio diferente.\n1. Ingresa la cantidad de dinero que deseas apostar.\n2. Cuando ingreses la opción 'Girar' los rodillos girarán y se detendrán de forma aleatoria.\n3. Si los símbolos se alinean en una combinación ganadora ganas un premio.\n4. Si ganas, puedes recoger el premio o seguir jugando.\nTabla de pago:\nTres SIETES - Apuesta x100\nTres CAMPANAS - Apuesta x30\nTres TRÉBOLES - Apuesta x15\nTres LIMONES - Apuesta x5\nTres CEREZAS - Apuesta x2\nCualquier combinación entre CAMPANA-TRÉBOL-LIMÓN - Apuesta x1\nDos CEREZAS en cualquier posición - Apuesta x1\nUna CEREZA - Apuesta x1"
         fs.writeFileSync(resolve('src', 'instrucciones.txt'), instrucciones);
     }
 
     // LEER INSTRUCCIONES
-     mostrarInstrucciones(): void {
+    mostrarInstrucciones(): void {
         this.crearInstruccion();
         const instrucciones = fs.readFileSync(resolve('src', 'instrucciones.txt'), { encoding: "utf8" });
         console.log(instrucciones);

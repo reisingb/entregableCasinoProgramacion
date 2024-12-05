@@ -1,0 +1,4 @@
+1. De forma opcional elige un color, un numero o ambos.
+2. Por cada opcion debes elegir tu apuesta.
+3. Luego de la eleccion a tu apuesta especificar tu monto.
+4. !A ganar!
