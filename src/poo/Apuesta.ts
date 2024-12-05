@@ -54,11 +54,12 @@ export class Apuesta {
         if (this.jugador.getMontoCredito() <= 0) {
             console.log(`${pc.yellow(`Saldo insuficiente.`)}\n${pc.bold(`Su saldo actual es de: ${this.jugador.getMontoCredito()}`)}`);
             // PREGUNTAR SI DESEA CARGAR
-            let carga: boolean = rd.keyInYNStrict("Salir para cargar?: ");
-            if (carga) {
-                juego.setSalirJuego(true);
+            let esCarga: boolean = rd.keyInYNStrict("Salir para cargar?: ");
+            if (esCarga) {
+                juego.setSalirJuego(true); //ATRIBUTO SALIR DE JUEGO SE ESTABLECE EN TRUE
                 return;
             } else {
+                // SI NO
                 this.procesarApuesta(juego); // REPETIR PROCESO
                 return;
             }
