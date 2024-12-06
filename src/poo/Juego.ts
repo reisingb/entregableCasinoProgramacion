@@ -3,7 +3,7 @@ import pc from "picocolors";
 import { Jugador } from "./Jugador";
 
 //CLASE JUEGO ABSTRACTA
-export abstract class Juego{
+export abstract class Juego {
     protected nombre: string; // NOMBRE DEL JUEGO
     protected apuestaMax: number; // APUESTA MINIMA
     protected apuestaMin: number; // APUESTA MAXIMA
@@ -51,7 +51,7 @@ export abstract class Juego{
     }
 
     // <------------------------METODOS COMUNES------------------------------------>
-    
+
     // METODO PARA MOSTRAR UN MENU CUANDO TERMINA EL JUEGO
     public mostrarMenuDespuesDeJuego(jugador: Jugador): void {
         let opcion: number;
