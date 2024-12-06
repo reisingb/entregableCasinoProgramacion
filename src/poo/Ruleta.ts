@@ -100,21 +100,6 @@ export class Ruleta extends Juego implements IJuego{
         return 0;
     }
 
-    // REINICIAR LA GANANCIA
-    private reiniciarGanancia(): void {
-        this.ganancia = 0;
-    }
-
-    // REINICIAR LA ACUMULACION DE APUESTAS
-    private reiniciarAcumuladorApuestas(): void {
-        this.acumuladorApuesta = 0;
-    }
-
-    // RESTAR APUESTA AL ACUMULADOR
-    private restarAcumuladorApuesta(apuesta: number) {
-        this.acumuladorApuesta - apuesta;
-    }
-
     // METODO PARA PEDIR NUMERO OPCIONAL
     private elegirNumero(): number | null {
         const esApuestaNumero: boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un numero?: "));
@@ -129,6 +114,21 @@ export class Ruleta extends Juego implements IJuego{
             return this.getNumeroElegido();
         }
         return null;
+    }
+
+    // REINICIAR LA GANANCIA
+    private reiniciarGanancia(): void {
+        this.ganancia = 0;
+    }
+
+    // REINICIAR LA ACUMULACION DE APUESTAS
+    private reiniciarAcumuladorApuestas(): void {
+        this.acumuladorApuesta = 0;
+    }
+
+    // RESTAR APUESTA AL ACUMULADOR
+    private restarAcumuladorApuesta(apuesta: number) {
+        this.acumuladorApuesta - apuesta;
     }
 
     // METODO PARA SABER SI EL NUMERO ELEGIDO ES EL GANADOR
@@ -268,7 +268,8 @@ export class Ruleta extends Juego implements IJuego{
 
     // CREAR EN TXT INSTRUCCIONES DEL JUEGO
     public crearInstruccion(): void {
-        let instrucciones = "1. De forma opcional elige un color, un numero o ambos.\n2. Por cada opcion debes elegir tu apuesta.\n3. Luego de la eleccion a tu apuesta especificar tu monto.\n4. !A ganar!"
+        let instrucciones = "***¿COMO JUGAR RULETA?***\n1. De forma opcional, elige un color, un numero o ambos.\n2. Por cada opcion, debes elegir tu apuesta.\n3. Despues de elegir tu apuesta, especifica el monto.\n\n***PREMIOS DE APUESTAS***\n-Color ganador: APUESTA X 2\n-Numero ganador: APUESTA X 35\n-Numero y Color Ganador: APUESTA X 2 + APUESTA X 35."
+
         fs.writeFileSync('./src/instrucciones.txt', instrucciones);
     }
 
@@ -278,5 +279,4 @@ export class Ruleta extends Juego implements IJuego{
         const instrucciones = fs.readFileSync('./src/instrucciones.txt',{ encoding: "utf8" });
         console.log(instrucciones);
     }
-
 }
