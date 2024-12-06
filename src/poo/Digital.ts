@@ -20,7 +20,7 @@ export class Digital extends Tragamoneda implements IJuego {
     }
 
     public jugar(jugador: Jugador): void {
-        console.log(`Apuesta mínima: ${this.getApuestaMin()}. Apuesta máxima: ${this.getApuestaMax()}.`);
+        console.log(`Apuesta minima: ${this.getApuestaMin()}. Apuesta maxima: ${this.getApuestaMax()}.`);
         let apuesta = jugador.apostar(this);
 
 
@@ -35,7 +35,7 @@ export class Digital extends Tragamoneda implements IJuego {
             if (this.girosGratisDisponibles) {
                 console.log("2. Giros gratis");
             }
-            opcion = rd.questionInt(pc.bold("Ingrese opción: "));
+            opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
         } while (opcion !== 1 && opcion !== 2);
 
 
@@ -45,7 +45,7 @@ export class Digital extends Tragamoneda implements IJuego {
             if (this.girosGratisDisponibles) {
                 this.girosGratis(jugador);
             } else {
-                console.log("¡Los giros gratuitos no están disponibles!");
+                console.log("¡Los giros gratuitos no estan disponibles!");
             }
         }
 
@@ -135,7 +135,7 @@ export class Digital extends Tragamoneda implements IJuego {
             const ganancia = this.calcularGanancia(1, resultado); // Usamos 1 como apuesta fija para las tiradas bono
             if (ganancia !== null && ganancia > 0) {
                 gananciaTotal += ganancia;
-                console.log(`Has ganado ${ganancia} créditos en esta jugada.`);
+                console.log(`Has ganado ${ganancia} creditos en esta jugada.`);
             } else {
                 console.log("No has ganado en esta jugada.");
             }
