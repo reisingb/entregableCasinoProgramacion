@@ -1,194 +1,282 @@
 import { Juego } from "./Juego";
 import pc from "picocolors";
-// import rd from "readline-sync";
+import rd from "readline-sync";
+import { Jugador } from "./Jugador";
+import { IJuego } from "./IJuegos";
 
-export class Ruleta extends Juego {
-    private numeros: number[];
-    private numerosElegidos: number[];
-    private color: string
-    private bolilla: number;
-    private fichas: number[];
-    private tiempoEspera: number;
+// MODULOS DE NODE 
+import fs from "node:fs";
 
-    constructor(nombre: string, apuestaMin: number, apuestaMax: number) {
-        super(nombre, apuestaMin, apuestaMax);
-        this.numeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
-        this.numerosElegidos = [];
-        this.bolilla = 0;
-        this.color = "Verde";
-        this.fichas = [30, 50, 100, 300, 500, 1000, 5000, 10000];
-        this.tiempoEspera = 5000;
+// JUEGO RULETA
+export class Ruleta extends Juego implements IJuego{
+    private colorElegido: number;
+    private numeroElegido: number;
+    private numerosRojos: number[];
+    private numerosNegros: number[];
+    private todosLosNumeros: number[]
+    private numeroGanador: number | null;
+    private ganancia: number;
+    private acumuladorApuesta: number;
+
+    constructor() {
+        super("Ruleta", 10, 10000);
+        this.colorElegido = 0;
+        this.numeroElegido = 37;
+        this.numeroGanador = null;
+        this.numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        this.numerosNegros = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
+        this.todosLosNumeros = [0, ...this.numerosRojos, ...this.numerosNegros];
+        this.ganancia = 0;
+        this.acumuladorApuesta = 0;
     }
 
-
-    //<-------------------------GETTERS Y SETTERS---------------------------------------->
-
-    public getColor(): string {
-        return this.color;
+    // <-------------------------------GETTERS Y SETTERS----------------------------------->
+    // OBTENER COLOR ELEGIDO 
+    public getColorElegido(): number {
+        return this.colorElegido;
     }
 
-    public setColor(color: string): void {
-        this.color = color;
+    // MODIFICAR COLOR ELEGIDO
+    public setColorElegido(colorElegido: number): void {
+        this.colorElegido = colorElegido;
     }
 
-    public getBolilla(): number {
-        return this.bolilla;
+    // OBTENER NUMERO ELEGIDO
+    public getNumeroElegido(): number {
+        return this.numeroElegido;
     }
 
-    public setBolilla(bolilla: number): void {
-        this.bolilla = bolilla;
+    // MODIFICAR NUMERO ELEGIDO
+    public setNumeroElegido(numeroElegido: number): void {
+        this.numeroElegido = numeroElegido;
     }
 
-    public getNumeros(): number[] {
-        return this.numeros;
+    // OBTENER NUMERO GANADOR
+    public getNumeroGanador(): number | null {
+        return this.numeroGanador;
     }
 
-    public setNumeros(numeros: number[]): void {
-        this.numeros = numeros;
+    // MODIFICAR NUMERO GANADOR
+    public setNumeroGanador(numeroGanador: number): void {
+        this.numeroGanador = numeroGanador;
     }
 
-    public getNumerosElegidos(): number[] {
-        return this.numerosElegidos;
+    // OBTENER GANANCIA
+    public getGanancia(): number {
+        return this.ganancia;
     }
 
-    public setNumerosElegidos(numeroElegido: number): void {
-        this.numerosElegidos.push(numeroElegido);
+    // MODIFICADOR ACUMULATIVO DE GANANCIA
+    public setGanancia(ganancia: number): void {
+        this.ganancia += ganancia;
     }
 
-    public getTiempoEspera(): number {
-        return this.tiempoEspera;
+    // OBTENER VALOR ACUMULADO
+    public getAcumuladorApuesta(): number {
+        return this.acumuladorApuesta;
     }
 
-    public setTiempoEspera(tiempoEspera: number): void {
-        this.tiempoEspera = tiempoEspera;
+    // MODIFICADOR ACUMULATIVO DE APUESTA
+    public setAcumuladorApuesta(apuesta: number): void {
+        this.acumuladorApuesta += apuesta;
     }
 
-    // <-------------------------A PARTIR DE ACA METODOS PROPIOS DEL JUEGO ---------------------------->
+    // <---------------METODOS COMUNES---------------------------------> 
 
-    // METODO GENERAL PARA ELEGIR OPCION DE APUESTA EN RULETA.
-    public elegir(): void {
-        let opcion: boolean = this.obtenerEntradaSegunKey("Desea elegir un color?: ");
-        if (opcion) {
-            this.elegirColor();
-            // SOBRE ESCRIBIR VARIABLE PARA PREGUNTAR SI ELEGE UN NUMERO
-            opcion = this.obtenerEntradaSegunKey("Desea elegir un numero? S/N: ");
-            // SI QUIERE ELEGIR NUMERO
-            if (opcion) {
-                this.elegirNumero();
+    // METODO PARA PEDIR COLOR OPCIONAL
+    private elegirColor(): number {
+        const esApuestaColor: boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un color?: "));
+        if (esApuestaColor) {
+            this.setColorElegido(rd.questionInt(pc.bold(`Elige un color ==> 1. ${pc.red("Rojo")} / 2. ${pc.gray("Negro")}: `)))
+            if (this.getColorElegido() === 1) {
+                return this.getColorElegido();
+            } else if (this.getColorElegido() === 2) {
+                return this.getColorElegido();
+            } else {
+                console.log(pc.red("Opcion invalida."));
+                return this.elegirColor();
             }
+        }
+        return 0;
+    }
+
+    // METODO PARA PEDIR NUMERO OPCIONAL
+    private elegirNumero(): number | null {
+        const esApuestaNumero: boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un numero?: "));
+        if (esApuestaNumero) {
+            do {
+                this.setNumeroElegido(rd.questionInt(pc.bold("Elige un numero (0-36): ")));
+
+                if (!this.todosLosNumeros.includes(this.getNumeroElegido())) {
+                    console.log(pc.red("Numero invalido. Intentalo nuevamente."));
+                }
+            } while (!this.todosLosNumeros.includes(this.getNumeroElegido()));
+            return this.getNumeroElegido();
+        }
+        return null;
+    }
+
+    // REINICIAR LA GANANCIA
+    private reiniciarGanancia(): void {
+        this.ganancia = 0;
+    }
+
+    // REINICIAR LA ACUMULACION DE APUESTAS
+    private reiniciarAcumuladorApuestas(): void {
+        this.acumuladorApuesta = 0;
+    }
+
+    // RESTAR APUESTA AL ACUMULADOR
+    private restarAcumuladorApuesta(apuesta: number) {
+        this.acumuladorApuesta - apuesta;
+    }
+
+    // METODO PARA SABER SI EL NUMERO ELEGIDO ES EL GANADOR
+    private esNumeroGanador(ganador: number): boolean {
+        return ganador === this.getNumeroElegido();
+    }
+
+    // METODO PARA EVALUAR SI EL COLOR ELEGIDO ES EL GANADOR
+    private esColorGanador(ganador: number): boolean {
+        return (this.getColorElegido() === 1 && this.numerosRojos.includes(ganador)) || (this.getColorElegido() === 2 && this.numerosNegros.includes(ganador));
+    }
+
+    // METODO QUE VALIDA LA GANANCIA
+    private validarGanancia(ganancia: number, jugador: Jugador): void {
+        if (this.getGanancia() > 0) {
+            if (this.isSalirJuego()) return;
+            jugador.aumentarSaldo(ganancia);
+            console.log(pc.green(pc.bold(`Felicidades! Has ganado ${ganancia} creditos!`)));
+            console.log(`Saldo actual: ${pc.cyan(pc.bold(jugador.getMontoCredito()))}`);
         } else {
-            this.elegirNumero();
+            if (this.isSalirJuego()) return;
+            console.log(pc.cyan(pc.bold("No has tenido suerte en esta ronda.")));
+            console.log(`Saldo actual: ${pc.cyan(pc.bold(jugador.getMontoCredito()))}`);
         }
     }
 
-    // METODO QUE SE ENCARGA DE PEDIR EL COLOR
-    public elegirColor(): void {
-        let opcionNum: number;
-        // MIENTRAS LA OPCION SEA ERRONEA EJECUTAR EL BUCLE WHILE
-        do {
-            // PEDIR EL COLOR
-            opcionNum = this.obtenerEntradaNum("Elige un color:\n1. Rojo\n2. Negro\n");
-            let condicion: boolean = opcionNum !== 1 && opcionNum !== 2;
-            if (condicion) {
-                console.log(pc.red("Opcion invalida, Vuelva a intentarlo..."));
-            }
-        } while (opcionNum !== 1 && opcionNum !== 2);
-
-        opcionNum === 1 ? this.setColor("Rojo") : this.setColor("Negro"); //USO DE OPERADOR TERNARIO.
-
-        // GUARDAR MINIMA Y MAXIMA DEL JUEGO
-        const minimaApuesta: number = this.getApuestaMin();
-        const maximaApuesta: number = this.getApuestaMax();
-
-        // FILTRAR LAS FICHAS QUE CUMPLAN LAS CONDICIONES
-        const fichasValidas: number[] = this.fichas.filter(ficha => ficha > minimaApuesta && ficha < maximaApuesta);
-
-        // GUARDAR AL PRINCIPIO Y FINAL DE LA LISTA DE FICHAS LOS MINIMOS Y MAXIMOS
-        fichasValidas.unshift(minimaApuesta);
-        fichasValidas.push(maximaApuesta);
-
-        
-        opcionNum = this.obtenerEntradaApuesta(`Elija una ficha para su apuesta al color ${this.getColor()}.\n${fichasValidas.join("-")}`);
-        // PEDIR AL USUARIO QUE ELIJA SU FICHA DE APUESTA AL COLOR
-        const condicion: boolean = !fichasValidas.includes(opcionNum);
-        const mensajeSecundario: string = "La ficha seleccionada es invalida, intente nuevamente...";
-
-        this.apostar(opcionNum);
+    // METODO GIRAR RULETA
+    private girar(): number {
+        console.log(pc.bold("Girando Ruleta.."));
+        const numeroGanador = Math.floor(Math.random() * 37); // 0-36
+        const colorGanador = this.numerosRojos.includes(numeroGanador) ? pc.red("Rojo") : this.numerosNegros.includes(numeroGanador) ? pc.gray("Negro") : pc.green("Verde");
+        console.log(pc.bold(`Numero ganador: ${pc.yellow(numeroGanador.toString())}\nColor ganador: ${colorGanador}`));
+        return numeroGanador;
     }
 
-    // METODO QUE SE ENCARGA DE PEDIR LOS NUMEROS ELEGIDOS
-    public elegirNumero(): void {
-        let opcionNum: number;
+    // METODO PARA GESTIONAR EL PROCESO DEL RESULTADO AL FINAL DE RONDA DEL JUEGO
+    private gestionarResultado(ganador: number, apuesta: number, jugador: Jugador, tipo: string): void {
+        if (this.isSalirJuego()) return;
+        this.setNumeroGanador(ganador); //AGREGAR NUMERO GANADOR
+        this.setGanancia(this.calcularGanancia(apuesta, [tipo])); //SUMAR GANANCIAS
+        this.validarGanancia(this.getGanancia(), jugador);  //VALIDAR SI HUBO GANANCIAS
+        this.reiniciarGanancia(); //REINICIAR GANANCIA A CERO
+        this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SALIR O CONTINUAR.
+    }
 
-        // MIENTRAS EL NUMERO ELEGIDO NO SEA UNO DE LA LISTA ---> VOLVER A PREGUNTAR
-        do {
-            // GUARDA EL NUMERO INGRESADO POR EL USUARIO.
-            opcionNum = this.obtenerEntradaNum("Elige un numero del 0 al 36: ");
-
-            // CONDICION A VALIDARSE.
-            let condicion: boolean = !this.numeros.includes(opcionNum);
-
-            // SI EL VALOR INGRESADO NO  CORRESPONDE A UNA FICHA
-            if (condicion) {
-                console.log(pc.red(`El numero elegido no es valido en una apuesta de ${this.getNombre()}`));
+    // VALIDAR PARA ASEGURAR QUE EL USUARIO EN SUS OPCIONES NO SE PASE DEL LIMITE
+    private validarAcumulacionDeApuestas(apuesta: number, jugador: Jugador): void {
+        // SI LAS APUESTAS ACUMULADAS SUPERAN EL MAXIMO DE APUESTA DEL JUEGO
+        if (this.getAcumuladorApuesta() > this.getApuestaMax()) {
+            console.log(pc.yellow("La acumulacion de sus apuestas han exedido el limite de apuestas del juego."));
+            const esCambiarMonto: boolean = rd.keyInYNStrict("Cambiar monto?: ");
+            if (esCambiarMonto) {
+                this.restarAcumuladorApuesta(apuesta); // RESTAR LA ULTIMA APUESTA EN ACUMULADOR DE APUESTA
+                jugador.aumentarSaldo(apuesta); // REEMBOLSAR LA APUESTA AL CREDITO DEL JUGADOR
+                if (this.isSalirJuego()) return  //VERIFICAR SI JUGADOR SALIO DEL JUEGO
+                apuesta = jugador.apostar(this); // AGREGAR NUEVO VALOR DE APUESTA AL PARAMETRO
+                console.log(pc.green("Su apuesta ha sido modificada"));
+                this.setAcumuladorApuesta(apuesta);  // VOLVER A ACUMULAR LA NUEVA APUESTA
+                this.reiniciarAcumuladorApuestas();
+            } else {
+                console.log(pc.cyan("No ha participado en esta ronda"));
+                jugador.aumentarSaldo(this.getAcumuladorApuesta()); //REEMBOLSAR TODAS LAS APUESTAS AL CREDITO
+                this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SEGUIR JUGANDO O NO
+                return;
             }
-
-        } while (!this.numeros.includes(opcionNum));
-
-
-        // PREGUNTAR SI QUIERE GIRAR RULETA
-        const preguntaGirar: boolean = this.obtenerEntradaSegunKey("Girar Ruleta?: ");
-
-        if (preguntaGirar) {
-            console.log(pc.cyan(pc.bold("***GIRANDO RULETA! BUENA SUERTE!***")));
-            this.girarRuleta();
-        } else {
-            this.elegirNumero();
         }
-
-        // const minimaApuesta: number = this.getApuestaMin();
-        // const maximaApuesta: number = this.getApuestaMax();
-
-        // const fichasValidas: number[] = this.fichas.filter(ficha => ficha > minimaApuesta && ficha < maximaApuesta);
-
-        // fichasValidas.unshift(minimaApuesta);
-        // fichasValidas.push(maximaApuesta);
-
-        // this.obtenerEntradaNum(`Elija una ficha para su apuesta al numero ${pc.red(`${opcionNum}:`)}\n${pc.yellow(fichasValidas.join("-"))}`);
-
-        // // AGREGAR NUMERO ELEGIDO A LA LISTA
-        // this.setNumerosElegidos(opcionNum);
-
-        // // PREGUNTAR SI QUIERE ELEGIR MAS NUMEROS
-        // let elegirOtro: boolean = this.obtenerEntradaSegunKey("Desea elegir otro numero? S/N: ");
-
-        // if (elegirOtro) {
-        //     this.elegirNumero();
-        // }
     }
 
+    // <------------------------------------METODOS A IMPLEMENTAR---------------------------------->
 
-    public girarRuleta(): number {
-        return 88;
+    // METODO A IMPLEMENTAR DE OPCIONES DE APUESTAS
+    public jugar(jugador: Jugador): void {
+        if (this.elegirColor() !== 0) {
+            const apuestaColor: number = jugador.apostar(this);
+            if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
+            this.setAcumuladorApuesta(apuestaColor); //GUARDAR ACUMULACION DE VALOR DE APUESTA
+
+            // EVALUAR SI EL JUGADOR AUN TIENE CREDITO ANTES DE CONTINUAR...
+            if (jugador.getMontoCredito() <= 0) {
+                const esCancelar: boolean = rd.keyInYNStrict("Se ha quedado sin saldo, cancelar apuesta?: ");
+                if (esCancelar) {
+                    jugador.setMontoCredito(apuestaColor);
+                    console.log(pc.bold(`${pc.green("Su apuesta se ha cancelado con exito.")}\n${pc.white("saldo actual:")}${pc.cyan(jugador.getMontoCredito())}`));
+                    this.menuJuego(jugador);
+                    return;
+                } else {
+                    const ganador = this.girar();
+                    this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+                    return;
+                }
+            }
+            // SI ELIGIO NUMERO 
+            if (this.elegirNumero() !== null) {
+                let apuestaNumero: number = jugador.apostar(this);
+                this.setAcumuladorApuesta(apuestaNumero); //GUARDAR ACUMULACION DE VALOR DE APUESTA
+                this.validarAcumulacionDeApuestas(apuestaNumero, jugador); //VERIFICAR ACUMULACION
+
+                if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
+                const ganador: number = this.girar();
+                this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+
+                // SI EL NUMERO SALIO GANADOR
+                if (this.esNumeroGanador(ganador)) {
+                    this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
+                }
+
+                this.reiniciarAcumuladorApuestas();
+            } else {
+                const ganador: number = this.girar();
+                this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+            }
+        } else { //SI SOLO ELIGIO NUMERO
+            if (this.elegirNumero() !== null) {
+                let apuestaNumero: number = jugador.apostar(this);
+                if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
+                const ganador = this.girar();
+                this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
+            }
+        }
     }
 
-    //<--------------------------A PARTIR DE ACA METODOS A IMPLEMENTAR---------------------------------------->
-    public calcularPerdida(): number {
-        return 1
+    // METODO DE CALCULO DE GANANCIA
+    public calcularGanancia(apuesta: number, resultado: string[]): number {
+        let ganador: number | null = this.getNumeroGanador();
+        let ganancia: number = 0;
+        // SI EL NUMERO ES GANADOR
+        if (ganador) {
+            if (resultado.includes("numero") && this.esNumeroGanador(ganador)) {
+                ganancia = apuesta * 35;
+            }
+            if (resultado.includes("color") && this.esColorGanador(ganador)) {
+                ganancia = apuesta * 2;
+            }
+        }
+        return ganancia; //RETORNO DE GANANCIA
     }
 
-    public calcularGanancia(): number {
-        return 0
+    // CREAR EN TXT INSTRUCCIONES DEL JUEGO
+    public crearInstruccion(): void {
+        let instrucciones = "***¿COMO JUGAR RULETA?***\n1. De forma opcional, elige un color, un numero o ambos.\n2. Por cada opcion, debes elegir tu apuesta.\n3. Despues de elegir tu apuesta, especifica el monto.\n\n***PREMIOS DE APUESTAS***\n-Color ganador: APUESTA X 2\n-Numero ganador: APUESTA X 35\n-Numero y Color Ganador: APUESTA X 2 + APUESTA X 35."
+
+        fs.writeFileSync('./src/instrucciones.txt', instrucciones);
     }
 
-    public iniciarJuego(): void {
-        console.log(pc.bgMagenta(`***Bienvenido al juego ${this.getNombre()}***`));
-        this.elegir();
+    // LEER INSTRUCCIONES
+    public mostrarInstrucciones(): void {
+        this.crearInstruccion();
+        const instrucciones = fs.readFileSync('./src/instrucciones.txt',{ encoding: "utf8" });
+        console.log(instrucciones);
     }
-    public calcularPagos(): number {
-        return 1;
-    }
-
-    // <------------------A PARTIR DE ACA METODOS COMUNES------------------------->
-
 }
