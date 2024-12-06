@@ -9,10 +9,11 @@ import fs from "node:fs";
 
 export class Analogico extends Tragamoneda implements IJuego {
     constructor() {
-        super("Tragamonedas Analogico", 1, 100, 3)
+        super("Tragamonedas Clasico", 1, 100, 3)
         this.simbolos = [`${pc.red(pc.bold("7"))}`, "🔔", "☘️", "🍋", "🍒"]
     }
 
+    //METODO PARA EMPEZAR A JUGAR
     public jugar(jugador: Jugador): void {
 
         console.log(`Apuesta minima: ${this.getApuestaMin()}. Apuesta maxima: ${this.getApuestaMax()}.`)
@@ -29,6 +30,7 @@ export class Analogico extends Tragamoneda implements IJuego {
         this.mostrarMenuDespuesDeJuego(jugador)
     }
 
+    //METODO QUE MUESTRA EL RESULTADO ALEATORIO Y LA GANANCIA
     public girar(jugador: Jugador, apuesta: number): void {
         console.log(`\n${pc.bold("Girando...")}\n`)
         let resultado: string[] = this.generarResultadoAleatorio()
@@ -47,6 +49,7 @@ export class Analogico extends Tragamoneda implements IJuego {
         console.log(`Saldo actual: ${pc.yellow(pc.bold(jugador.getMontoCredito()))}`)
     }
 
+    //METODO QUE CALCULA GANANCIA SEGUN LA APUESTA Y LA COMBINACION GANADORA
     calcularGanancia(apuesta: number, resultado: string[]): number | null {
         if (resultado) {
             if (resultado[0] === "7" && resultado[1] === "7" && resultado[2] === "7") {
@@ -92,7 +95,7 @@ export class Analogico extends Tragamoneda implements IJuego {
     // LEER INSTRUCCIONES
     mostrarInstrucciones(): void {
         this.crearInstruccion();
-        const instrucciones = fs.readFileSync('./src/instrucciones.txt',{ encoding: "utf8" });
+        const instrucciones = fs.readFileSync('./src/instrucciones.txt', { encoding: "utf8" });
         console.log(instrucciones);
     }
 }
