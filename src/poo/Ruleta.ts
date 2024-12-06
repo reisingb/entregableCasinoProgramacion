@@ -6,7 +6,6 @@ import { IJuego } from "./IJuegos";
 
 // MODULOS DE NODE 
 import fs from "node:fs";
-import { resolve } from "node:path";
 
 // JUEGO RULETA
 export class Ruleta extends Juego implements IJuego{
@@ -270,13 +269,13 @@ export class Ruleta extends Juego implements IJuego{
     // CREAR EN TXT INSTRUCCIONES DEL JUEGO
     public crearInstruccion(): void {
         let instrucciones = "1. De forma opcional elige un color, un numero o ambos.\n2. Por cada opcion debes elegir tu apuesta.\n3. Luego de la eleccion a tu apuesta especificar tu monto.\n4. !A ganar!"
-        fs.writeFileSync(resolve('src', 'instrucciones.txt'), instrucciones);
+        fs.writeFileSync('./src/instrucciones.txt', instrucciones);
     }
 
     // LEER INSTRUCCIONES
     public mostrarInstrucciones(): void {
         this.crearInstruccion();
-        const instrucciones = fs.readFileSync(resolve('src', 'instrucciones.txt'), { encoding: "utf8" });
+        const instrucciones = fs.readFileSync('./src/instrucciones.txt',{ encoding: "utf8" });
         console.log(instrucciones);
     }
 

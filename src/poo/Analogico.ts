@@ -6,7 +6,6 @@ import { IJuego } from "./IJuegos";
 
 // MODULOS DE NODE 
 import fs from "node:fs";
-import { resolve } from "node:path";
 
 export class Analogico extends Tragamoneda implements IJuego {
     constructor() {
@@ -87,13 +86,13 @@ export class Analogico extends Tragamoneda implements IJuego {
     // ESCRIBIR EN TXT INSTRUCCIONES DEL JUEGO
     crearInstruccion(): void {
         let instrucciones = "Este Tragamonedas tiene 3 rodillos y una única línea de pago. Existen diferentes símbolos, y cada combinación ofrece un premio diferente.\n1. Ingresa la cantidad de dinero que deseas apostar.\n2. Cuando ingreses la opción 'Girar' los rodillos girarán y se detendrán de forma aleatoria.\n3. Si los símbolos se alinean en una combinación ganadora ganas un premio.\n4. Si ganas, puedes recoger el premio o seguir jugando.\nTabla de pago:\nTres SIETES - Apuesta x100\nTres CAMPANAS - Apuesta x30\nTres TRÉBOLES - Apuesta x15\nTres LIMONES - Apuesta x5\nTres CEREZAS - Apuesta x2\nCualquier combinación entre CAMPANA-TRÉBOL-LIMÓN - Apuesta x1\nDos CEREZAS en cualquier posición - Apuesta x1\nUna CEREZA - Apuesta x1"
-        fs.writeFileSync(resolve('src', 'instrucciones.txt'), instrucciones);
+        fs.writeFileSync('./src/instrucciones.txt', instrucciones);
     }
 
     // LEER INSTRUCCIONES
     mostrarInstrucciones(): void {
         this.crearInstruccion();
-        const instrucciones = fs.readFileSync(resolve('src', 'instrucciones.txt'), { encoding: "utf8" });
+        const instrucciones = fs.readFileSync('./src/instrucciones.txt',{ encoding: "utf8" });
         console.log(instrucciones);
     }
 }
