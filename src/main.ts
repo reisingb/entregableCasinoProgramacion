@@ -9,12 +9,12 @@ import { Ruleta } from "./poo/Ruleta";
 const casino: Casino = new Casino("Casino 'La suerte'");
 
 // CREACION DE JUEGOS
-const digital: Digital = new Digital();
-const analogico: Analogico = new Analogico();
+const giroBonus: Digital = new Digital();
+const clasico: Analogico = new Analogico();
 //  const dado: Dado = new Dado("dados", 20, 5,2);
 const ruleta: Ruleta = new Ruleta();
 casino.agregarJuego(ruleta);
-casino.agregarJuego(analogico);
-casino.agregarJuego(digital);
+casino.agregarJuego(clasico);
+casino.agregarJuego(giroBonus);
 // casino.agregarJuego(dado);
 casino.menuPrincipal();

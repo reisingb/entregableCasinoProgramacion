@@ -1,7 +1,6 @@
 import { Juego } from "./Juego";
 import { Jugador } from "./Jugador";
 
-// SUPER CLASE
 export abstract class Tragamoneda extends Juego {
     protected simbolos: string[] = []
     protected carretes: number;
@@ -9,10 +8,11 @@ export abstract class Tragamoneda extends Juego {
         super(nombre, apustaMax, apuestaMin);
         this.carretes = carretes
     }
-    //HACER EL METODO CALCULARGANANCIA() EN LOS DOS JUEGOS (tabla de pagos) 3
 
+    //METODO ABSTRACTO
     public abstract girar(jugador: Jugador, apuesta:number): void
 
+    //METODO QUE GENERA RESULTADO ALEATORIO
     public generarResultadoAleatorio(): string[] {
         const combinacion: string[] = [];
         for (let i = 0; i < this.carretes; i++) {
