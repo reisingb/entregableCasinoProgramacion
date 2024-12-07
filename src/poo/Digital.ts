@@ -71,7 +71,7 @@ export class Digital extends Tragamoneda implements IJuego {
         console.log(`Saldo actual: ${pc.yellow(pc.bold(jugador.getMontoCredito()))}`)
     }
 
-    calcularGanancia(apuesta: number, resultado: string[]): number | null {
+    calcularGanancia(apuesta: number, resultado: string[]): number {
         if (resultado) {
             if (resultado[0] === "👑" && resultado[1] === "👑" && resultado[2] === "👑" && resultado[3] === "👑" && resultado[4] === "👑" && resultado[5] === "👑") {
                 return apuesta * 100;
@@ -116,7 +116,7 @@ export class Digital extends Tragamoneda implements IJuego {
                 }
             }
         }
-        return null;
+        return 0;
     }
 
     public girosGratis(jugador: Jugador): void {

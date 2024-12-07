@@ -1,4 +1,4 @@
 export interface IJuego{
     crearInstruccion(): void
-    calcularGanancia(apuesta:number,resultado?: string[]): number | null;
+    calcularGanancia(apuesta:number,resultado?: string[]): number;
 }
