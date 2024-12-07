@@ -50,7 +50,7 @@ export class Analogico extends Tragamoneda implements IJuego {
     }
 
     //METODO QUE CALCULA GANANCIA SEGUN LA APUESTA Y LA COMBINACION GANADORA
-    calcularGanancia(apuesta: number, resultado: string[]): number | null {
+    calcularGanancia(apuesta: number, resultado: string[]): number {
         if (resultado) {
             if (resultado[0] === "7" && resultado[1] === "7" && resultado[2] === "7") {
                 return apuesta * 100;
@@ -81,9 +81,9 @@ export class Analogico extends Tragamoneda implements IJuego {
                     return apuesta * 1;
                 }
             }
-            return 0;
+            
         }
-        return null
+        return 0;
     }
 
     // ESCRIBIR EN TXT INSTRUCCIONES DEL JUEGO

@@ -11,10 +11,10 @@ const casino: Casino = new Casino("Casino 'La suerte'");
 // CREACION DE JUEGOS
 const giroBonus: Digital = new Digital();
 const clasico: Analogico = new Analogico();
-//  const dado: Dado = new Dado("dados", 20, 5,2);
+const dado: Dado = new Dado();
 const ruleta: Ruleta = new Ruleta();
 casino.agregarJuego(ruleta);
 casino.agregarJuego(clasico);
 casino.agregarJuego(giroBonus);
-// casino.agregarJuego(dado);
+casino.agregarJuego(dado);
 casino.menuPrincipal();
