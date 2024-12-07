@@ -9,13 +9,21 @@ export abstract class Tragamoneda extends Juego {
         this.carretes = carretes
     }
 
+    public getCarretes(): number {
+        return this.carretes;
+    }
+
+    public setCarretes(carretes: number): void {
+        this.carretes = carretes;
+    }
+
     //METODO ABSTRACTO
     public abstract girar(jugador: Jugador, apuesta:number): void
 
     //METODO QUE GENERA RESULTADO ALEATORIO
     public generarResultadoAleatorio(): string[] {
         const combinacion: string[] = [];
-        for (let i = 0; i < this.carretes; i++) {
+        for (let i:number = 0; i < this.carretes; i++) {
             const indiceAleatorio: number = Math.floor(Math.random() * this.simbolos.length)
             combinacion.push(this.simbolos[indiceAleatorio])
         }

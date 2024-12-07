@@ -24,6 +24,9 @@ export class Analogico extends Tragamoneda implements IJuego {
             if (this.isSalirJuego()) return;
             console.log("1. Girar rodillos");
             opcion = rd.questionInt(pc.bold("Ingrese opcion: "))
+            if (opcion !== 1) {
+                console.log(pc.red("Opcion invalida, por favor intente nuevamente."));
+            }
         } while (opcion !== 1);
 
         this.girar(jugador, apuesta)
@@ -35,7 +38,7 @@ export class Analogico extends Tragamoneda implements IJuego {
         console.log(`\n${pc.bold("Girando...")}\n`)
         let resultado: string[] = this.generarResultadoAleatorio()
         let mostrarResultado = "|"; //esto puede ser un metodo
-        for (let i = 0; i < resultado.length; i++) {
+        for (let i:number = 0; i < resultado.length; i++) {
             mostrarResultado += `${resultado[i]} |`;
         }
         console.log(mostrarResultado);
@@ -70,7 +73,7 @@ export class Analogico extends Tragamoneda implements IJuego {
                 return apuesta * 3;
             } else {
                 let contadorCerezas = 0;
-                for (let i = 0; i < resultado.length; i++) {
+                for (let i:number = 0; i < resultado.length; i++) {
                     if (resultado[i] === "🍒") {
                         contadorCerezas++;
                     }
