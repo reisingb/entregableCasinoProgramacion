@@ -23,32 +23,34 @@ export class Digital extends Tragamoneda implements IJuego {
         console.log(`Apuesta minima: ${this.getApuestaMin()}. Apuesta maxima: ${this.getApuestaMax()}.`);
         let apuesta = jugador.apostar(this);
 
-
-        // Probabilidad de 40% para las tiradas bono
-        this.girosGratisDisponibles = Math.random() <= 0.40;
-
-
         let opcion: number;
         do {
             if (this.isSalirJuego()) return;
-            console.log("1. Girar rodillos");
-            if (this.girosGratisDisponibles) {
-                console.log("2. Giros gratis");
-            }
-            opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
-        } while (opcion !== 1 && opcion !== 2);
 
+            console.log("1. Girar rodillos");
+            opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
+            if (opcion !== 1 && opcion !== 2) {
+                console.log("Opcion invalida");
+            } else if (this.girosGratisDisponibles) {
+                console.log("1. Girar rodillos");
+                console.log("2. Giros gratis");
+                opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
+            } else if (opcion === 2 && !this.girosGratisDisponibles) {
+                console.log("¡Los giros gratuitos no estan disponibles!. Vuelve a intentar.");
+            }
+        } while ((opcion !== 1 && opcion !== 2) || (opcion === 2 && !this.girosGratisDisponibles));
 
         if (opcion === 1) {
             this.girar(jugador, apuesta);
-        } else if (opcion === 2) {
-            if (this.girosGratisDisponibles) {
-                this.girosGratis(jugador);
-            } else {
-                console.log("¡Los giros gratuitos no estan disponibles!");
-            }
+            // Probabilidad de 40% para las tiradas bono
+            this.girosGratisDisponibles = Math.random() <= 0.40;
+        } else if (opcion === 2 && this.girosGratisDisponibles) {
+            this.girosGratis(jugador);
+        } else if (opcion === 2 && !this.girosGratisDisponibles) {
+            console.log("¡Los giros gratuitos no estan disponibles!");
+        } else {
+            console.log("Opcion invalida");
         }
-
 
         this.mostrarMenuDespuesDeJuego(jugador);
     }

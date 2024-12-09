@@ -11,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "picocolors": "^1.1.1",
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "table": "^6.9.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",

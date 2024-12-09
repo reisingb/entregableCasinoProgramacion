@@ -3,7 +3,8 @@ import { Jugador } from "./Jugador";
 import { IJuego } from "./IJuegos";
 import fs from "node:fs";
 import { Juego } from './Juego';
-
+import pc from "picocolors";
+import { table } from "table";
 export class Bingo extends Juego implements IJuego {
     private esGanador: boolean = false;
     private maxNumerosCantados: number;
@@ -17,17 +18,23 @@ export class Bingo extends Juego implements IJuego {
         this.numeros = [];
     }
 
-    isGanador(): boolean {
+    public getNumeros(): number[] {
+        return this.numeros;
+    }
+
+    public setNumeros(numeros: number[]): void {
+        this.numeros = numeros;
+    }
+
+    private isGanador(): boolean {
         return this.esGanador
     }
-    setGanador(esGanador: boolean): void {
+    private setGanador(esGanador: boolean): void {
         this.esGanador = esGanador
     }
 
     // genera los numeros cantados aleatoriamente del 1 al 75
     public generarNumero(numerosCantados: Set<number>): number {
-
-        const maxNumerosCantados = 50; // Límite de números cantados
         const rangoNumeros = 75; // Rango máximo de números
         let numero: number;
         do {
@@ -37,12 +44,12 @@ export class Bingo extends Juego implements IJuego {
         return numero;
     }
 
-    public crearCartonDesdeEntrada(numeros: number[]): number[][] {
+    public crearCartonDesdeEntrada(): number[][] {
         const carton: number[][] = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 2; i++) {
             const fila: number[] = [];
             for (let j = 0; j < 5; j++) {
-                fila.push(numeros[i * 5 + j]);
+                fila.push(this.numeros[i * 5 + j]);
             }
             carton.push(fila);
         }
@@ -50,109 +57,81 @@ export class Bingo extends Juego implements IJuego {
     }
     // verifica los numeros cantados y los que ingresados por consola
     public verificarGanador(carton: number[][], numerosCantados: number[]): void {
-
-        for (const fila of carton) {
-            if (fila.every(num => numerosCantados.includes(num))) {
-                this.setGanador(true);
-            }
-        }
-
-        for (let col = 0; col < 5; col++) {
-            if (carton.every(fila => numerosCantados.includes(fila[col]))) {
-                this.setGanador(true);
-            }
-        }
-
+        const todosNumerosDelCarton = carton.flat(); // Aplanar las filas en un solo arreglo
+        const todosAcertados = todosNumerosDelCarton.every(num => numerosCantados.includes(num));
+        this.setGanador(todosAcertados);
     }
 
+    public calcularGanancia(): number {
+        return this.isGanador() ? 5000 : 0
+    }
 
+    // MOSTRAR CARTON E NUMEROS ELEGIDOS
+    public mostrarCarton = (): number[][] => {
+        // MIENTRAS EL ARREGLO DE NUMEROS SEA MENOR A 10 PEDIR
+        while (this.numeros.length < 10) {
+            const input: string = readlineSync.question(`${pc.bold(`Numero ${this.numeros.length + 1}:`)} `);
+            const numero: number = parseInt(input);
 
-    // muestra los numeros cantados por consola
-    public jugarBingo(carton: number[][]) {
-        const numerosCantados: Set<number> = new Set(); // usa un set para evitar numeros duplicados
-        let ganador: boolean = false;
-
-
-        while (!ganador && numerosCantados.size < this.maxNumerosCantados) {
-
-
-            const numero = this.generarNumero(numerosCantados);
-            numerosCantados.add(numero);
-            console.log(`Numero cantado: ${numero}`);
-
-            this.verificarGanador(carton, Array.from(numerosCantados));
-
-        }
-
-
-        if (this.isGanador()) {
-            console.log("¡Bingo! Has ganado el pozo de 5000$.");
-        } else {
-            console.log("Se han cantado 50 nunmeros y no hay ganador.");
-        }
-
-
-        // solicita al usuario ingresar numero por consola
-        const numeros: number[] = [];
-
-        console.log("Por favor, ingresa 10 numeros (del 1 al 75) para tu carton de bingo, uno por uno:");
-
-        while (numeros.length < 10) {
-            const input = readlineSync.question(`Numero ${numeros.length + 1}: `);
-            const numero = parseInt(input);
-
-            if (numero >= 1 && numero <= this.rangoNumeros && !numeros.includes(numero)) {
-                numeros.push(numero);
+            if (numero >= 1 && numero <= this.rangoNumeros && !this.numeros.includes(numero)) {
+                this.numeros.push(numero);
             } else {
                 console.log("Numero invalido o ya ingresado. Por favor, ingresa un numero unico entre 1 y 75.");
             }
         }
+        const cartonNuevo: number[][] = this.crearCartonDesdeEntrada();
+        console.log(table(cartonNuevo)); //CREAR TABLA Y MOSTRAR CON LIBRERIA
+        return cartonNuevo;
     }
 
-    calcularGanancia(): number {
-        if (this.isGanador()) {
-            return 5000;
+
+    // muestra los numeros cantados por consola
+    public jugarBingo(carton: number[][]): void {
+        const numerosCantados: Set<number> = new Set(); // usa un set para evitar numeros duplicados
+        while (numerosCantados.size < this.maxNumerosCantados) {
+            const numero: number = this.generarNumero(numerosCantados);
+            numerosCantados.add(numero);
+            console.log(`Numero cantado: ${numero}`);
+
+            this.verificarGanador(carton, Array.from(numerosCantados));
         }
-        return 0;
-
-
-
-    }
-
-    public mostrarCarton = (): void => {
-
-        const carton: number[][] = this.crearCartonDesdeEntrada(this.numeros);
-
-
-
-
-        let cartonNuevo: number[][] = carton.filter((_, i) => i < 2)
-        console.table(cartonNuevo)
-
-        this.jugarBingo(carton)
     }
 
     public jugar(jugador: Jugador): void {
-        this.mostrarCarton()
-        jugador.aumentarSaldo(this.calcularGanancia())
+        // SI EL JUGADOR TIENE SALDO Y SI EL SALDO ES MENOR A 1000(PRECIO DE CARTON)
+        if (jugador.getMontoCredito() <= 0 || jugador.getMontoCredito() < 1000) {
+            console.log(pc.red("No tiene saldo para comprar carton. Valor de carton $1000"));
+            this.setSalirJuego(true);
+        }
+        if (this.isSalirJuego()) return //SI ES TRUE SALIR
+
+        // SI SALIR ES FALSE
+        jugador.restarSaldoActual(1000) //RESTAMOS EL SALDO POR SU COMPRA
+        console.log(pc.green(`Tu compra de carton fue un exito, tu saldo actual es de: ${pc.cyan(jugador.getMontoCredito())}`));
+
+        const carton: number[][] = this.mostrarCarton(); //GUARDAR EN VARIABLE LA MATRIZ QUE RETORNA mostrarCarton()
+        this.jugarBingo(carton);
+        jugador.aumentarSaldo(this.calcularGanancia());  //AUMENTAR GANANCIA SI ACERTO SINO 0
+
+        if (this.isGanador()) {
+            console.log(`¡Bingo! Has ganado el pozo de $5000. Saldo actual:${pc.cyan(jugador.getMontoCredito())}`);
+        } else {
+            console.log(pc.bold(pc.magenta("Se han cantado 50 numeros y no hay ganador.")));
+        }
+
+        this.mostrarMenuDespuesDeJuego(jugador);
     }
 
-    public mostrarMenuDespuesDeJuego(jugador: Jugador): void {
-
-    }
-
-    crearInstruccion(): void {
-        let instrucciones = "para jugar este juego debe ingresar por consola 10 numeros del 1 al 75, al correr el bolillero le mostrara 50 numeros aleatorios que salen y verificara si estan los numeros que usted ingreso"
+    // CREAR INSTRUCCIONES DE BINGO
+    public crearInstruccion(): void {
+        let instrucciones = "-Para jugar este juego debe tener mas de 1000 creditos para la compra del carton\n-Ingresar por consola 10 numeros del 1 al 75\n-Al correr el bolillero le mostrara 50 numeros aleatorios que salen y verificara si estan los numeros que usted ingreso"
         fs.writeFileSync('./src/instrucciones.txt', instrucciones);
     }
 
     // LEER INSTRUCCIONES
-    mostrarInstrucciones(): void {
+    public mostrarInstrucciones(): void {
         this.crearInstruccion();
         const instrucciones = fs.readFileSync('./src/instrucciones.txt', { encoding: "utf8" });
         console.log(instrucciones);
     }
-
-
-
 }

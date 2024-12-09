@@ -8,13 +8,13 @@ import { IJuego } from "./IJuegos";
 import fs from "node:fs";
 
 // JUEGO RULETA
-export class Ruleta extends Juego implements IJuego{
+export class Ruleta extends Juego implements IJuego {
     private colorElegido: number;
     private numeroElegido: number;
     private numerosRojos: number[];
     private numerosNegros: number[];
     private todosLosNumeros: number[]
-    private numeroGanador: number | null;
+    private numeroGanador: number;
     private ganancia: number;
     private acumuladorApuesta: number;
 
@@ -22,7 +22,7 @@ export class Ruleta extends Juego implements IJuego{
         super("Ruleta", 10, 10000);
         this.colorElegido = 0;
         this.numeroElegido = 37;
-        this.numeroGanador = null;
+        this.numeroGanador = 0;
         this.numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
         this.numerosNegros = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
         this.todosLosNumeros = [0, ...this.numerosRojos, ...this.numerosNegros];
@@ -52,7 +52,7 @@ export class Ruleta extends Juego implements IJuego{
     }
 
     // OBTENER NUMERO GANADOR
-    public getNumeroGanador(): number | null {
+    public getNumeroGanador(): number {
         return this.numeroGanador;
     }
 
@@ -101,7 +101,7 @@ export class Ruleta extends Juego implements IJuego{
     }
 
     // METODO PARA PEDIR NUMERO OPCIONAL
-    private elegirNumero(): number | null {
+    private elegirNumero(): number {
         const esApuestaNumero: boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un numero?: "));
         if (esApuestaNumero) {
             do {
@@ -113,7 +113,7 @@ export class Ruleta extends Juego implements IJuego{
             } while (!this.todosLosNumeros.includes(this.getNumeroElegido()));
             return this.getNumeroElegido();
         }
-        return null;
+        return -1;
     }
 
     // REINICIAR LA GANANCIA
@@ -183,16 +183,24 @@ export class Ruleta extends Juego implements IJuego{
             if (esCambiarMonto) {
                 this.restarAcumuladorApuesta(apuesta); // RESTAR LA ULTIMA APUESTA EN ACUMULADOR DE APUESTA
                 jugador.aumentarSaldo(apuesta); // REEMBOLSAR LA APUESTA AL CREDITO DEL JUGADOR
-                if (this.isSalirJuego()) return  //VERIFICAR SI JUGADOR SALIO DEL JUEGO
                 apuesta = jugador.apostar(this); // AGREGAR NUEVO VALOR DE APUESTA AL PARAMETRO
+                if (this.isSalirJuego()) return  //VERIFICAR SI JUGADOR SALIO DEL JUEGO
+                this.validarAcumulacionDeApuestas(apuesta,jugador);
                 console.log(pc.green("Su apuesta ha sido modificada"));
                 this.setAcumuladorApuesta(apuesta);  // VOLVER A ACUMULAR LA NUEVA APUESTA
-                this.reiniciarAcumuladorApuestas();
             } else {
-                console.log(pc.cyan("No ha participado en esta ronda"));
-                jugador.aumentarSaldo(this.getAcumuladorApuesta()); //REEMBOLSAR TODAS LAS APUESTAS AL CREDITO
-                this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SEGUIR JUGANDO O NO
-                return;
+                const esGirarRuleta: boolean = rd.keyInYNStrict("Girar Ruleta?: ");
+                if(!esGirarRuleta){
+                    console.log(pc.cyan("No ha participado en esta ronda"));
+                    this.girar();
+                    jugador.aumentarSaldo(this.getAcumuladorApuesta()); //REEMBOLSAR TODAS LAS APUESTAS AL CREDITO
+                    this.reiniciarAcumuladorApuestas();
+                    this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SEGUIR JUGANDO O NO
+                    return;
+                }
+                this.restarAcumuladorApuesta(apuesta); // RESTAR LA ULTIMA APUESTA EN ACUMULADOR DE APUESTA
+                jugador.aumentarSaldo(apuesta);
+                this.reiniciarAcumuladorApuestas();
             }
         }
     }
@@ -212,16 +220,18 @@ export class Ruleta extends Juego implements IJuego{
                 if (esCancelar) {
                     jugador.setMontoCredito(apuestaColor);
                     console.log(pc.bold(`${pc.green("Su apuesta se ha cancelado con exito.")}\n${pc.white("saldo actual:")}${pc.cyan(jugador.getMontoCredito())}`));
+                    this.reiniciarAcumuladorApuestas();
                     this.menuJuego(jugador);
                     return;
                 } else {
                     const ganador = this.girar();
                     this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+                    this.reiniciarAcumuladorApuestas();
                     return;
                 }
             }
             // SI ELIGIO NUMERO 
-            if (this.elegirNumero() !== null) {
+            if (this.elegirNumero() >= 0) {
                 let apuestaNumero: number = jugador.apostar(this);
                 this.setAcumuladorApuesta(apuestaNumero); //GUARDAR ACUMULACION DE VALOR DE APUESTA
                 this.validarAcumulacionDeApuestas(apuestaNumero, jugador); //VERIFICAR ACUMULACION
@@ -234,25 +244,28 @@ export class Ruleta extends Juego implements IJuego{
                 if (this.esNumeroGanador(ganador)) {
                     this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
                 }
-
                 this.reiniciarAcumuladorApuestas();
             } else {
                 const ganador: number = this.girar();
                 this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+                this.reiniciarAcumuladorApuestas();
             }
-        } else { //SI SOLO ELIGIO NUMERO
-            if (this.elegirNumero() !== null) {
-                let apuestaNumero: number = jugador.apostar(this);
-                if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
-                const ganador = this.girar();
-                this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
-            }
+        } else if (this.elegirNumero() >= 0) {  //SI SOLO ELIGIO NUMERO
+            let apuestaNumero: number = jugador.apostar(this);
+            if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
+            const ganador = this.girar();
+            this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
+            this.reiniciarAcumuladorApuestas();
+        }else{
+            console.log(pc.cyan("No has elegido ninguna apuesta en esta ronda"));
+            this.girar();
+            this.mostrarMenuDespuesDeJuego(jugador);
         }
     }
 
     // METODO DE CALCULO DE GANANCIA
     public calcularGanancia(apuesta: number, resultado: string[]): number {
-        let ganador: number | null = this.getNumeroGanador();
+        let ganador: number = this.getNumeroGanador();
         let ganancia: number = 0;
         // SI EL NUMERO ES GANADOR
         if (ganador) {
@@ -276,7 +289,7 @@ export class Ruleta extends Juego implements IJuego{
     // LEER INSTRUCCIONES
     public mostrarInstrucciones(): void {
         this.crearInstruccion();
-        const instrucciones = fs.readFileSync('./src/instrucciones.txt',{ encoding: "utf8" });
+        const instrucciones = fs.readFileSync('./src/instrucciones.txt', { encoding: "utf8" });
         console.log(instrucciones);
     }
 }
