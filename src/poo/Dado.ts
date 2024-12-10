@@ -35,8 +35,10 @@ export class Dado extends Juego implements IJuego {
 
 
     calcularGanancia(apuesta: number, resultado?: string[]): number {
-        if (this.validarNumeroDeseado(this.getNumeroDeseado())) {
+        const resultadoDados = this.lanzarDado();
+        if (this.validarNumeroDeseado(resultadoDados)) {
             const ganancia: number = apuesta * 2; // Gana el doble de su apuesta
+            console.log(pc.bold(` el resultado de su tirada de dados es : ${resultadoDados}`));
             console.log(pc.green(`¡Felicidades! Ganaste ${ganancia} créditos.`));
             return ganancia;
         }
@@ -87,7 +89,7 @@ export class Dado extends Juego implements IJuego {
             jugador.aumentarSaldo(ganancia);
         }
 
-        console.log(pc.bold(` el resultado de su tirada de dados es : ${this.lanzarDado()}`));
+        
 
 
         console.log(pc.bold(`Tu saldo actual es: ${pc.yellow(jugador.getMontoCredito())} créditos.`));
