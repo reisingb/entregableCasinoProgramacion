@@ -62,47 +62,56 @@ export class Casino {
     }
 
     // VERIFICAR EL JUEGO ELEGIDO Y RETORNAR
-    public validarJuegoElegido(opcionElegida: number, jugador: Jugador): void {
+    public async validarJuegoElegido(opcionElegida: number, jugador: Jugador): Promise<void> {
         let longitudJuegos: number = this.juegos.length;
-        // SI LA OPCION ELEGIDA ESTA ENTRE EL RANGO 1 A LONGITUD DE LISTA DE JUEGOS...
+    
         if (opcionElegida >= 1 && opcionElegida <= longitudJuegos) {
-            //INICIAR EL JUEGO CORRESPONDIENTE RESTANDOLE 1 PARA ACCEDER AL INDICE CORRESPONDIENTE...
-            this.juegos[opcionElegida - 1].iniciarMenuJuego(jugador)
+            // INICIA EL JUEGO Y ESPERA
+            console.clear();
+            await this.juegos[opcionElegida - 1].iniciarMenuJuego(jugador);
+        } else if (opcionElegida === longitudJuegos + 1) {
+            console.clear();
+            await this.mostrarOpcionesCasino(jugador); 
         } else {
-            if (opcionElegida === longitudJuegos + 1) {
-                this.mostrarOpcionesCasino(jugador);
-            }
+            console.clear();
+            console.log(pc.red("Opción inválida."));
         }
     }
+    
 
     // VALIDAMOS LAS OPCIONES DEL MENU PRINCIPAL
-    public validarOpcionesMenuPrincipal(opcion: number, jugador: Jugador): void {
+    public async validarOpcionesMenuPrincipal(opcion: number, jugador: Jugador): Promise<void> {
         switch (opcion) {
             case 1: {
-                this.mostrarJuegos(jugador);
+                console.clear();
+                await this.mostrarJuegos(jugador);
                 break;
             }
             case 2: {
-                this.validarOpcionesCarga(jugador);
+                console.clear();
+                this.validarOpcionesCarga(jugador); 
                 break;
             }
             case 3: {
+                console.clear();
                 this.setSalir(true);
-                return;
+                break;
             }
             default: {
+                console.clear();
                 console.log(pc.red("Opcion invalida."));
                 break;
             }
         }
     }
+    
 
     // VERIFICAR OPCION ELEGIDA AL CARGAR CREDITO
     public validarOpcionesCarga(jugador: Jugador): void {
         let carga: number;
         // MIENTRAS LA CARGA ES MENOR O IGUAL A CERO
         do {
-            carga = rd.questionInt(pc.bold("Ingrese el monto a cargar: "));
+            carga = rd.questionInt(pc.bold("Ingrese el monto para su carga: "));
             // SI LA CARGA INTENTA SER MENOR O IGUAL A CERO--->MENSAJE ERROR
             if (carga <= 0) {
                 console.log(pc.red("No puedes cargar un valor menor o igual a cero."));
@@ -135,50 +144,49 @@ export class Casino {
     }
 
     // MOSTRAR OPCIONES DEL CASINO
-    private mostrarOpcionesCasino(jugador: Jugador): void {
+    private async mostrarOpcionesCasino(jugador: Jugador): Promise<void> {
         let opcion: number;
-        // TERMINARA EL PROGRAMA CUANDO SALIR SEA---->TRUE
         do {
-            // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
-            opcion = rd.questionInt(`${pc.cyan("Elige una opcion ==>")} ${pc.bold("1. Ver juegos")}/${pc.bold("2. Cargar: ")}/${pc.bold("3. Salir Casino: ")}`);
-            this.validarOpcionesMenuPrincipal(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
+            opcion = rd.questionInt(
+                `${pc.cyan("Elige una opcion ==>")} ${pc.bold("1. Ver juegos")}/${pc.bold("2. Cargar")}/${pc.bold("3. Salir Casino")}: `
+            );
+            // Validamos las opciones y esperamos si es necesario.
+            await this.validarOpcionesMenuPrincipal(opcion, jugador);
         } while (!this.isSalir());
     }
+    
 
     // MOSTRAR JUEGOS DEL CASINO
-    private mostrarJuegos(jugador: Jugador): void {
-        // SI LA LISTA DE JUEGOS TIENE CONTENIDO...
+    private async mostrarJuegos(jugador: Jugador): Promise<void> {
         if (this.getJuegos().length > 0) {
             const longitudJuegos: number = this.juegos.length;
-            let numeroAtras: number = longitudJuegos + 1;
-
-            // CREAR UN NUEVO ARREGLO SOLO CON LOS NOMBRES DE JUEGOS.
-            const listaNombres: string = this.juegos.map((juego, i) => { // [] ju1,
-                let inicioOpcion = i + 1; //--->ANTES DE RETORNAR GUARDAR LA SUMA DE (I + 1, SABIENDO QUE I ES EL INDICE) --->PARA COMENZAR CON OPCIONES DESDE 1 EN ADELANTE.
-                return `${inicioOpcion}. ${juego.getNombre()}`; //-->RETORNO DE EJEMPLO--> ["1. DADO", "2. RULETA", ETC].
-            }).join("/") //-->MEDIANTE EL JOIN  UNIR LOS ELEMENTO SEPARANDOLOS POR UN "/" CREANDO UN SOLO STRING---> EJEMPLO-->"1. DADO/2. RULETA/ETC."
-
+            const numeroAtras: number = longitudJuegos + 1;
+    
+            const listaNombres: string = this.juegos
+                .map((juego, i) => `${i + 1}. ${juego.getNombre()}`)
+                .join("/");
+    
             let opcion: number;
             do {
-                // PEDIR A USUARIO ELEGIR LA OPCION NUMERICA
-                opcion = rd.questionInt(`${pc.cyan("Elige juego o volver ===>")} ${pc.bold(listaNombres)}/${pc.bold(`${numeroAtras}. Atras:`)} `);
-                if (opcion < 1 || opcion > numeroAtras) {
-                    console.log(pc.red("Opcion no valida."));
-                }
-                this.validarJuegoElegido(opcion, jugador);//VALIDAR LA OPCION ELEGIDA Y PROCESAR.
+                opcion = rd.questionInt(
+                    `${pc.cyan("Elige juego o volver ===>")} ${pc.bold(listaNombres)}/${pc.bold(`${numeroAtras}. Atras`)}: `
+                );
+                // VALIDAMOS EL JUEGO DE FORMA ASINCRONA.
+                await this.validarJuegoElegido(opcion, jugador);
             } while (opcion < 1 || opcion > numeroAtras);
         }
     }
+    
 
     // INICIO PROGRAMA PRINCIPAL
-    public menuPrincipal(): void {
-        const nuevoJugador:Jugador = this.crearJugador(); //EL METODO NOS RETORNABA UN JUGADOR ¿RECUERDAN?---> SE GUARDO EN VARIABLE PARA REFERENCIA.
-        this.agregarJugador(nuevoJugador); //GUARDO EL NUEVO JUGADOR.
-        // DAMOS LA BIENVENIDA EN TERMINAL
-        console.log(pc.bold(`Hola ${nuevoJugador.getNombre()}!, Bienvenido al casino!🎰🎰🎰\n`));
+    public async menuPrincipal(): Promise<void> {
+        const nuevoJugador: Jugador = this.crearJugador();
+        this.agregarJugador(nuevoJugador);
+        console.log(pc.bold(`Hola ${nuevoJugador.getNombre()}!, Bienvenido al casino! 🎰🎰🎰\n`));
         console.log(pc.bold(`Tu saldo actual es: ${pc.yellow(nuevoJugador.getMontoCredito())} creditos.`));
-        this.mostrarOpcionesCasino(nuevoJugador); //----> LLAMAR FUNCION PARA VALIDAR QUE HARÁ EL USUARIO DESDE UN PRINCIPIO.
-        // DESPEDIDA
-        console.log(pc.cyan("Gracias por su visita!, Hasta la proxima! :)"));
+        // MOSTRAR LAS OPCIONES DEL CASINO DE FORMA ASINCRONA
+        await this.mostrarOpcionesCasino(nuevoJugador);
+        console.log(pc.cyan("Gracias por su visita!, Hasta la próxima! :)"));
     }
+    
 }

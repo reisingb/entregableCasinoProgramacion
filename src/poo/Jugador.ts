@@ -59,6 +59,7 @@ export class Jugador {
 
     // PROCESAR CARGA DE CREDITO
     public cargarCredito(carga: number): void {
+        console.clear();
         this.aumentarSaldo(carga);
         console.log(pc.bold(`${pc.cyan("¡Gracias por su carga!")}\n${pc.green("Credito disponible: ")}${this.getMontoCredito()}`));
     }

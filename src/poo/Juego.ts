@@ -53,64 +53,72 @@ export abstract class Juego {
     // <------------------------METODOS COMUNES------------------------------------>
 
     // METODO PARA MOSTRAR UN MENU CUANDO TERMINA EL JUEGO
-    public mostrarMenuDespuesDeJuego(jugador: Jugador): void {
+    public async mostrarMenuDespuesDeJuego(jugador: Jugador): Promise<void> {
         let opcion: number;
         do {
             console.log("\n¿Que desea hacer ahora?");
             console.log("1. Seguir jugando/ 2. Ir a menu del juego");
             opcion = rd.questionInt(pc.bold("Ingrese opcion: "));
-
+    
             if (opcion === 1) {
+                console.clear();
                 console.log(pc.blue("¡A seguir jugando!"));
-                this.jugar(jugador);
+                await this.jugar(jugador); // ASEGURAR ESPERA
             } else if (opcion === 2) {
-                this.menuJuego(jugador)
+                console.clear();
+                await this.menuJuego(jugador); // ASEGURAR ESPERA
             } else {
+                console.clear();
                 console.log(pc.red("Opcion invalida. Intente nuevamente."));
             }
         } while (opcion !== 1 && opcion !== 2);
     }
-
+    
     // METODO DE VALIDACION DE SUBMENU DENTRO DE UN JUEGO
-    public validarOpcionesJuego(opcion: number, jugador: Jugador): void {
+    public async validarOpcionesJuego(opcion: number, jugador: Jugador): Promise<void> {
         switch (opcion) {
             case 1: {
-                this.mostrarInstrucciones();
+                await this.mostrarInstrucciones();
+                await this.menuJuego(jugador);
                 break;
             }
             case 2: {
                 this.setSalirJuego(false);
-                this.jugar(jugador); //ABSTRACTO
+                await this.jugar(jugador); // ESPERAR
                 return;
             }
             case 3: {
+                console.clear();
                 this.setSalirJuego(true);
                 return;
             }
             default: {
+                console.clear();
                 console.log(pc.magenta(pc.bold("Error, intentelo nuevamente")));
-                this.menuJuego(jugador);
+                await this.menuJuego(jugador); // ESPERAR
                 break;
             }
         }
     }
-
+    
     // METODO QUE NOS MOSTRARA EN CONSOLA LAS OPCIONES QUE TENDRAN TODOS LOS JUEGOS.
-    public menuJuego(jugador: Jugador): void {
+    public async menuJuego(jugador: Jugador): Promise<void> {
         let opcionMenu: number;
         do {
             opcionMenu = rd.questionInt(pc.yellow(pc.bold(pc.magenta('1. Ver Instruccion/2. Comenzar Juego/3. Salir Juego: '))));
-            this.validarOpcionesJuego(opcionMenu, jugador);
+            await this.validarOpcionesJuego(opcionMenu, jugador);
         } while (!this.isSalirJuego());
     }
+    
 
     // IMPLEMENTACION PARA INICIAR JUEGO
-    public iniciarMenuJuego(jugador: Jugador): void {
+    public async iniciarMenuJuego(jugador: Jugador): Promise<void> {
+        console.clear();
         console.log(pc.bold(`${pc.yellow(`Has iniciado el Juego 🎰 ==> ${pc.bold(this.getNombre())}`)}\nSaldo Actual: ${pc.yellow(jugador.getMontoCredito())}`));
-        this.menuJuego(jugador);
+        await this.menuJuego(jugador);
     }
 
     // <------------------------METODOS ABSTRACTOS------------------------------------>
-    abstract jugar(jugador: Jugador): void;
-    abstract mostrarInstrucciones(): void;
+    abstract jugar(jugador: Jugador): Promise<void>;
+    abstract mostrarInstrucciones(): Promise<void>;
 }

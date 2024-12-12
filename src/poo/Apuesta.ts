@@ -39,8 +39,8 @@ export class Apuesta {
     public procesarApuesta(juego: Juego): void {
         const apuesta: number = rd.questionInt(pc.bold("Ingrese el monto para su apuesta: "));
         this.setMonto(apuesta);
-        if (this.jugador.getMontoCredito() <= 0) {
-            console.log(`${pc.yellow(`Saldo insuficiente.`)}\n${pc.bold(`Su saldo actual es de: ${this.jugador.getMontoCredito()}`)}`);
+        if (this.jugador.getMontoCredito() <= 0 || this.getMonto() > this.jugador.getMontoCredito()) {
+            console.log(`${pc.yellow(`Saldo insuficiente para el monto de su apuesta.`)}\n${pc.bold(`Su saldo actual es de: ${this.jugador.getMontoCredito()}`)}`);
             // PREGUNTAR SI DESEA CARGAR
             let esCarga: boolean = rd.keyInYNStrict("Salir para cargar?: ");
             if (esCarga) {

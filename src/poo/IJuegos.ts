@@ -1,4 +1,4 @@
 export interface IJuego{
-    crearInstruccion(): void
+    crearInstruccion(): Promise<void>
     calcularGanancia(apuesta:number,resultado?: string[]): number;
 }
