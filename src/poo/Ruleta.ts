@@ -314,7 +314,7 @@ export class Ruleta extends Juego implements IJuego {
     // LEER INSTRUCCIONES
     public async mostrarInstrucciones(): Promise<void> {
         console.clear();
-        this.crearInstruccion();
+        await this.crearInstruccion();
         const instrucciones = fs.readFileSync('./src/instrucciones.txt', { encoding: "utf8" });
         console.log(instrucciones);
     }
