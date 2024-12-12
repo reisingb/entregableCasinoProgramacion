@@ -83,6 +83,18 @@ export class Ruleta extends Juego implements IJuego {
 
     // <---------------METODOS COMUNES---------------------------------> 
 
+    // METODO PARA CREAR LA PROMESA
+    public crearPromesa(time: number): Promise<number> {
+        console.clear();
+        console.log(pc.bold("Girando Ruleta..."));
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.clear();
+                resolve(this.girar());
+            }, time);
+        });
+    }
+
     // METODO PARA PEDIR COLOR OPCIONAL
     private elegirColor(): number {
         const esApuestaColor: boolean = rd.keyInYNStrict(pc.bold("Deseas apostar a un color?: "));
@@ -145,11 +157,13 @@ export class Ruleta extends Juego implements IJuego {
     private validarGanancia(ganancia: number, jugador: Jugador): void {
         if (this.getGanancia() > 0) {
             if (this.isSalirJuego()) return;
+            // console.clear();
             jugador.aumentarSaldo(ganancia);
             console.log(pc.green(pc.bold(`Felicidades! Has ganado ${ganancia} creditos!`)));
             console.log(`Saldo actual: ${pc.cyan(pc.bold(jugador.getMontoCredito()))}`);
         } else {
             if (this.isSalirJuego()) return;
+            // console.clear();
             console.log(pc.cyan(pc.bold("No has tenido suerte en esta ronda.")));
             console.log(`Saldo actual: ${pc.cyan(pc.bold(jugador.getMontoCredito()))}`);
         }
@@ -157,7 +171,6 @@ export class Ruleta extends Juego implements IJuego {
 
     // METODO GIRAR RULETA
     private girar(): number {
-        console.log(pc.bold("Girando Ruleta.."));
         const numeroGanador = Math.floor(Math.random() * 37); // 0-36
         const colorGanador = this.numerosRojos.includes(numeroGanador) ? pc.red("Rojo") : this.numerosNegros.includes(numeroGanador) ? pc.gray("Negro") : pc.green("Verde");
         console.log(pc.bold(`Numero ganador: ${pc.yellow(numeroGanador.toString())}\nColor ganador: ${colorGanador}`));
@@ -165,37 +178,41 @@ export class Ruleta extends Juego implements IJuego {
     }
 
     // METODO PARA GESTIONAR EL PROCESO DEL RESULTADO AL FINAL DE RONDA DEL JUEGO
-    private gestionarResultado(ganador: number, apuesta: number, jugador: Jugador, tipo: string): void {
+    private async gestionarResultado(ganador: number, apuesta: number, jugador: Jugador, tipo: string): Promise<void> {
         if (this.isSalirJuego()) return;
         this.setNumeroGanador(ganador); //AGREGAR NUMERO GANADOR
         this.setGanancia(this.calcularGanancia(apuesta, [tipo])); //SUMAR GANANCIAS
         this.validarGanancia(this.getGanancia(), jugador);  //VALIDAR SI HUBO GANANCIAS
         this.reiniciarGanancia(); //REINICIAR GANANCIA A CERO
-        this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SALIR O CONTINUAR.
+        await this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SALIR O CONTINUAR.
     }
 
     // VALIDAR PARA ASEGURAR QUE EL USUARIO EN SUS OPCIONES NO SE PASE DEL LIMITE
-    private validarAcumulacionDeApuestas(apuesta: number, jugador: Jugador): void {
+    private async validarAcumulacionDeApuestas(apuesta: number, jugador: Jugador): Promise<void> {
         // SI LAS APUESTAS ACUMULADAS SUPERAN EL MAXIMO DE APUESTA DEL JUEGO
         if (this.getAcumuladorApuesta() > this.getApuestaMax()) {
+            console.clear();
             console.log(pc.yellow("La acumulacion de sus apuestas han exedido el limite de apuestas del juego."));
             const esCambiarMonto: boolean = rd.keyInYNStrict("Cambiar monto?: ");
             if (esCambiarMonto) {
+                console.clear();
                 this.restarAcumuladorApuesta(apuesta); // RESTAR LA ULTIMA APUESTA EN ACUMULADOR DE APUESTA
                 jugador.aumentarSaldo(apuesta); // REEMBOLSAR LA APUESTA AL CREDITO DEL JUGADOR
                 apuesta = jugador.apostar(this); // AGREGAR NUEVO VALOR DE APUESTA AL PARAMETRO
                 if (this.isSalirJuego()) return  //VERIFICAR SI JUGADOR SALIO DEL JUEGO
-                this.validarAcumulacionDeApuestas(apuesta,jugador);
+                this.validarAcumulacionDeApuestas(apuesta, jugador);
                 console.log(pc.green("Su apuesta ha sido modificada"));
                 this.setAcumuladorApuesta(apuesta);  // VOLVER A ACUMULAR LA NUEVA APUESTA
             } else {
+                console.clear();
                 const esGirarRuleta: boolean = rd.keyInYNStrict("Girar Ruleta?: ");
-                if(!esGirarRuleta){
+                if (!esGirarRuleta) {
+                    console.clear();
                     console.log(pc.cyan("No ha participado en esta ronda"));
-                    this.girar();
+                    await this.crearPromesa(5000)
                     jugador.aumentarSaldo(this.getAcumuladorApuesta()); //REEMBOLSAR TODAS LAS APUESTAS AL CREDITO
                     this.reiniciarAcumuladorApuestas();
-                    this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SEGUIR JUGANDO O NO
+                    await this.mostrarMenuDespuesDeJuego(jugador); //PREGUNTAR SI SEGUIR JUGANDO O NO
                     return;
                 }
                 this.restarAcumuladorApuesta(apuesta); // RESTAR LA ULTIMA APUESTA EN ACUMULADOR DE APUESTA
@@ -208,58 +225,67 @@ export class Ruleta extends Juego implements IJuego {
     // <------------------------------------METODOS A IMPLEMENTAR---------------------------------->
 
     // METODO A IMPLEMENTAR DE OPCIONES DE APUESTAS
-    public jugar(jugador: Jugador): void {
+    public async jugar(jugador: Jugador): Promise<void> {
+        console.clear();
         if (this.elegirColor() !== 0) {
+            console.clear();
             const apuestaColor: number = jugador.apostar(this);
             if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
             this.setAcumuladorApuesta(apuestaColor); //GUARDAR ACUMULACION DE VALOR DE APUESTA
 
             // EVALUAR SI EL JUGADOR AUN TIENE CREDITO ANTES DE CONTINUAR...
             if (jugador.getMontoCredito() <= 0) {
+                console.clear();
                 const esCancelar: boolean = rd.keyInYNStrict("Se ha quedado sin saldo, cancelar apuesta?: ");
                 if (esCancelar) {
+                    console.clear();
                     jugador.setMontoCredito(apuestaColor);
                     console.log(pc.bold(`${pc.green("Su apuesta se ha cancelado con exito.")}\n${pc.white("saldo actual:")}${pc.cyan(jugador.getMontoCredito())}`));
                     this.reiniciarAcumuladorApuestas();
                     this.menuJuego(jugador);
                     return;
                 } else {
-                    const ganador = this.girar();
-                    this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+                    console.clear();
+                    const ganador: number = await this.crearPromesa(5000);
+                    await this.gestionarResultado(ganador, apuestaColor, jugador, "color");
                     this.reiniciarAcumuladorApuestas();
                     return;
                 }
             }
             // SI ELIGIO NUMERO 
             if (this.elegirNumero() >= 0) {
+                console.clear();
                 let apuestaNumero: number = jugador.apostar(this);
                 this.setAcumuladorApuesta(apuestaNumero); //GUARDAR ACUMULACION DE VALOR DE APUESTA
                 this.validarAcumulacionDeApuestas(apuestaNumero, jugador); //VERIFICAR ACUMULACION
 
                 if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
-                const ganador: number = this.girar();
-                this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+                const ganador: number = await this.crearPromesa(5000);
+                await this.gestionarResultado(ganador, apuestaColor, jugador, "color");
 
                 // SI EL NUMERO SALIO GANADOR
                 if (this.esNumeroGanador(ganador)) {
-                    this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
+                     await this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
                 }
                 this.reiniciarAcumuladorApuestas();
             } else {
-                const ganador: number = this.girar();
-                this.gestionarResultado(ganador, apuestaColor, jugador, "color");
+                console.clear();
+                const ganador:number = await this.crearPromesa(5000);
+                await this.gestionarResultado(ganador, apuestaColor, jugador, "color");
                 this.reiniciarAcumuladorApuestas();
             }
         } else if (this.elegirNumero() >= 0) {  //SI SOLO ELIGIO NUMERO
+            console.clear();
             let apuestaNumero: number = jugador.apostar(this);
             if (this.isSalirJuego()) return; //EVALUAR SI SALIO DEL JUEGO
-            const ganador = this.girar();
-            this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
+            const ganador:number= await this.crearPromesa(5000);
+            await this.gestionarResultado(ganador, apuestaNumero, jugador, "numero");
             this.reiniciarAcumuladorApuestas();
-        }else{
+        } else {
+            console.clear();
             console.log(pc.cyan("No has elegido ninguna apuesta en esta ronda"));
-            this.girar();
-            this.mostrarMenuDespuesDeJuego(jugador);
+            await this.crearPromesa(5000);
+            await this.mostrarMenuDespuesDeJuego(jugador);
         }
     }
 
@@ -280,14 +306,14 @@ export class Ruleta extends Juego implements IJuego {
     }
 
     // CREAR EN TXT INSTRUCCIONES DEL JUEGO
-    public crearInstruccion(): void {
-        let instrucciones = "***¿COMO JUGAR RULETA?***\n1. De forma opcional, elige un color, un numero o ambos.\n2. Por cada opcion, debes elegir tu apuesta.\n3. Despues de elegir tu apuesta, especifica el monto.\n\n***PREMIOS DE APUESTAS***\n-Color ganador: APUESTA X 2\n-Numero ganador: APUESTA X 35\n-Numero y Color Ganador: APUESTA X 2 + APUESTA X 35."
-
+    public async crearInstruccion(): Promise<void> {
+        let instrucciones = "***¿COMO JUGAR RULETA?***\n1. De forma opcional, elige un color, un numero o ambos.\n2. Por cada opcion, debes elegir tu apuesta.\n3. Despues de elegir tu apuesta, especifica el monto.\n\n***PREMIOS DE APUESTAS***\n-Color ganador: APUESTA X 2\n-Numero ganador: APUESTA X 35\n-Numero y Color Ganador: APUESTA X 2 + APUESTA X 35.";
         fs.writeFileSync('./src/instrucciones.txt', instrucciones);
     }
 
     // LEER INSTRUCCIONES
-    public mostrarInstrucciones(): void {
+    public async mostrarInstrucciones(): Promise<void> {
+        console.clear();
         this.crearInstruccion();
         const instrucciones = fs.readFileSync('./src/instrucciones.txt', { encoding: "utf8" });
         console.log(instrucciones);
