@@ -24,7 +24,7 @@ export class Bingo extends Juego implements IJuego {
         this.esGanador = false;
         this.contador = 1;
         this.valorCarton = 1000;
-        this.expRegNumeros = /^\d{1,2}$/m;
+        this.expRegNumeros = /^\d{1,2}$/m; //EXPRESION REGULAR PARA QUE SOLO SEAN NUMEROS Y DE 2 CIFRAS
     }
 
     // ------->GETTERS Y SETTERS<-----------------------------------------------//
@@ -146,8 +146,7 @@ export class Bingo extends Juego implements IJuego {
             } else {
                 console.log(pc.yellow(`Numero invalido o ya ingresado. Por favor, ingresa un numero unico entre 1 y ${this.getRangoNumeros()}.`));
             }
-        } while (this.numeros.length < 10 || input === "")
-        // console.clear();
+        } while (this.numeros.length < 10 || input === "");
     }
 
     // METODO ACTUALIZADOR DE TABLA GENERAL DE LOS NUMEROS DEL BINGO
